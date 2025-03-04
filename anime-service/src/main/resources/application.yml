@@ -1,7 +1,15 @@
 spring:
   application:
     name: anime-service
+  threads:
+    virtual:
+      enabled: true
 
 server:
   servlet:
     context-path: / #default
+  error:
+    include-stacktrace: on_param
+  tomcat:
+    threads:
+      max: 20 #padrão é 200 -> diminuindo o numero de threads e habilitando as virtuals aumenta muito a performace com menos memoria
