@@ -31,8 +31,7 @@ public class ProducerController {
         return producers.stream().filter(a -> a.getName().equals(name)).toList();
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE,
-            headers = "x-api-key")
+    @PostMapping(headers = "x-api-key")
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
         log.info("{}", headers);
         Producer producer = MAPPER.toProducer(producerPostRequest);
@@ -40,12 +39,7 @@ public class ProducerController {
         Producer.getProducers().add(producer);
 
 
-        ProducerGetResponse response1 = MAPPER.toProducerGetResponse(producer);
-        var response = ProducerGetResponse.builder()
-                .id(producer.getId())
-                .name(producer.getName())
-                .createdAt(producer.getCreatedAt())
-                .build();
+        ProducerGetResponse response = MAPPER.toProducerGetResponse(producer);
 
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

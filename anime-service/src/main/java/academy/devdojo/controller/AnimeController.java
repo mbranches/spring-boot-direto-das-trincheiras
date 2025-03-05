@@ -1,31 +1,40 @@
 package academy.devdojo.controller;
 
+import academy.devdojo.mapper.AnimeMapper;
 import academy.devdojo.model.Anime;
+import academy.devdojo.requests.AnimePostRequest;
+import academy.devdojo.response.AnimeGetResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @RestController
 @RequestMapping("v1/animes")
 public class AnimeController {
+    private static final AnimeMapper MAPPER = AnimeMapper.INSTANCE;
 
     @GetMapping
-    public List<Anime> listAll(@RequestParam(required = false) String name) {
-        List<Anime> animeList = Anime.animes;
+    public List<AnimeGetResponse> listAll(@RequestParam(required = false) String name) {
+        List<AnimeGetResponse> animeGetResponseList = MAPPER.toAnimeGetResponseList(Anime.animes);
 
-        if (name == null) return animeList;
+        if (name == null) return animeGetResponseList;
 
-        return animeList.stream().filter(a -> a.getName().equals(name)).toList();
+        return animeGetResponseList.stream().filter(a -> a.getName().equals(name)).toList();
     }
 
     @PostMapping
-    public Anime addAnime(@RequestBody Anime anime) {
-        anime.setId(ThreadLocalRandom.current().nextLong(1, 10));
+    public ResponseEntity<AnimeGetResponse> addAnime(@RequestBody AnimePostRequest postRequest) {
+        log.debug("{}", postRequest);
+        Anime anime = MAPPER.toAnime(postRequest);
         Anime.animes.add(anime);
-        return anime;
+        AnimeGetResponse response = MAPPER.toAnimeGetResponse(anime);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("{id}")
