@@ -6,10 +6,11 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Builder
-public class ProducerGetResponse {
+@Getter
+public class AnimeGetResponse {
+//    @JsonProperty("id")
     private Long id;
+//    @JsonProperty("name")
     private String name;
-    private LocalDateTime createdAt;
 }
