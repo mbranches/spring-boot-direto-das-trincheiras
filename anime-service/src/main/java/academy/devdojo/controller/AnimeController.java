@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,6 +42,6 @@ public class AnimeController {
     public Anime findById(@PathVariable Long id) {
         return Anime.listAllAnimes().stream()
                 .filter(a -> a.getId().equals(id))
-                .findFirst().orElse(null);
+                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime not Found"));
     }
 }
