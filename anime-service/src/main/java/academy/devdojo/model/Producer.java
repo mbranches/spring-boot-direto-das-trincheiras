@@ -2,20 +2,35 @@ package academy.devdojo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@Builder
+@Getter
 public class Producer {
     private Long id;
-    @JsonProperty("full_name")
     private String name;
-    public static List<Producer> producers = new ArrayList<>(List.of(new Producer(1L, "Mappa"), new Producer(2L, "Kyoto Animation"), new Producer(3L, "MadHouse")));
+    private LocalDateTime createdAt;
+    private static List<Producer> producers = new ArrayList<>();
+    static {
+        Producer mappa = Producer.builder().id(1L).name("Mappa").createdAt(LocalDateTime.now()).build();
+        Producer kyoto = Producer.builder().id(2L).name("Kyoto Animation").createdAt(LocalDateTime.now()).build();
+        Producer madHouse = Producer.builder().id(3L).name("MadHouse").createdAt(LocalDateTime.now()).build();
+        producers.addAll(List.of(mappa, kyoto, madHouse));
+    }
 
     public static List<Producer> getProducers() {
         return producers;
+    }
+
+    public static void addProducer(Producer producer) {
+        Producer.producers.add(producer);
     }
 }
