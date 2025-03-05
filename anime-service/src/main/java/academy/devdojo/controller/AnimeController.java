@@ -44,4 +44,19 @@ public class AnimeController {
                 .filter(a -> a.getId().equals(id))
                 .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime not Found"));
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> remove(@PathVariable Long id) {
+        List<Anime> animeList = Anime.listAllAnimes();
+
+        Anime animeToBeDeleted = animeList.stream()
+                .filter(anime -> anime.getId().equals(id))
+                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime not Found"));
+
+        animeList.remove(animeToBeDeleted);
+        log.info(animeList.toString());
+        log.info("{}", animeToBeDeleted);
+
+        return ResponseEntity.noContent().build();
+    }
 }
