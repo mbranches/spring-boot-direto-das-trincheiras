@@ -1,9 +1,11 @@
 package academy.devdojo.controller;
 
+import academy.devdojo.mapper.ProducerMapper;
 import academy.devdojo.model.Producer;
 import academy.devdojo.requests.ProducerPostRequest;
 import academy.devdojo.response.ProducerGetResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @RestController
 @RequestMapping("v1/producers")
 public class ProducerController {
+    private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
 
     @GetMapping
     public List<Producer> listAll(@RequestParam(required = false) String name) {
@@ -32,14 +35,12 @@ public class ProducerController {
             headers = "x-api-key")
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
         log.info("{}", headers);
-        var producer = Producer.builder()
-                .id(ThreadLocalRandom.current().nextLong(100_000))
-                .name(producerPostRequest.getName())
-                .createdAt(LocalDateTime.now())
-                .build();
+        Producer producer = MAPPER.toProducer(producerPostRequest);
 
         Producer.getProducers().add(producer);
 
+
+        ProducerGetResponse response1 = MAPPER.toProducerGetResponse(producer);
         var response = ProducerGetResponse.builder()
                 .id(producer.getId())
                 .name(producer.getName())

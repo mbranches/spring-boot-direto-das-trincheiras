@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 
 @Builder
 public class ProducerGetResponse {
+    @JsonProperty("id")
     private Long id;
     @JsonProperty("name")
     private String name;
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 }
