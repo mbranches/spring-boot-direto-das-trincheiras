@@ -23,12 +23,12 @@ public class ProducerController {
     private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
 
     @GetMapping
-    public List<Producer> listAll(@RequestParam(required = false) String name) {
-        List<Producer> producers = Producer.getProducers();
+    public List<ProducerGetResponse> listAll(@RequestParam(required = false) String name) {
+        List<ProducerGetResponse> producerGetResponseList = MAPPER.toProducerGetResponseList(Producer.getProducers());
 
-        if (name == null) return producers;
+        if (name == null) return producerGetResponseList;
 
-        return producers.stream().filter(a -> a.getName().equals(name)).toList();
+        return producerGetResponseList.stream().filter(a -> a.getName().equals(name)).toList();
     }
 
     @PostMapping(headers = "x-api-key")
@@ -36,7 +36,7 @@ public class ProducerController {
         log.info("{}", headers);
         Producer producer = MAPPER.toProducer(producerPostRequest);
 
-        Producer.getProducers().add(producer);
+        Producer.addProducer(producer);
 
 
         ProducerGetResponse response = MAPPER.toProducerGetResponse(producer);
@@ -47,9 +47,10 @@ public class ProducerController {
 
 
     @GetMapping("{id}")
-    public Producer findById(@PathVariable Long id) {
+    public ProducerGetResponse findById(@PathVariable Long id) {
         return Producer.getProducers().stream()
                 .filter(a -> a.getId().equals(id))
+                .map(MAPPER::toProducerGetResponse)
                 .findFirst().orElse(null);
     }
 }
