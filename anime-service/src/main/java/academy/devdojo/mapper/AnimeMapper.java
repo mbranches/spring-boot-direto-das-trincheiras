@@ -2,6 +2,7 @@ package academy.devdojo.mapper;
 
 import academy.devdojo.model.Anime;
 import academy.devdojo.requests.AnimePostRequest;
+import academy.devdojo.requests.AnimePutRequest;
 import academy.devdojo.response.AnimeGetResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,6 +16,8 @@ public interface AnimeMapper {
 
     @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(1, 10))")
     Anime toAnime(AnimePostRequest postRequest);
+
+    Anime toAnime(AnimePutRequest putRequest);
 
     AnimeGetResponse toAnimeGetResponse(Anime anime);
 
