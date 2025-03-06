@@ -11,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,15 +19,15 @@ import java.util.List;
 @RequestMapping("v1/producers")
 public class ProducerController {
     private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
-    private ProducerService producerService;
+    private ProducerService service;
 
     public ProducerController() {
-        this.producerService = new ProducerService();
+        this.service = new ProducerService();
     }
 
     @GetMapping
     public ResponseEntity<List<ProducerGetResponse>> listAll(@RequestParam(required = false) String name) {
-        List<Producer> producers = producerService.findAll(name);
+        List<Producer> producers = service.findAll(name);
 
         List<ProducerGetResponse> producerGetResponse = MAPPER.toProducerGetResponseList(producers);
 
@@ -39,7 +38,7 @@ public class ProducerController {
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
         Producer producer = MAPPER.toProducer(producerPostRequest);
 
-        Producer producerSaved = producerService.save(producer);
+        Producer producerSaved = service.save(producer);
 
         ProducerGetResponse response = MAPPER.toProducerGetResponse(producerSaved);
 
@@ -49,7 +48,7 @@ public class ProducerController {
 
     @GetMapping("{id}")
     public ResponseEntity<ProducerGetResponse> findById(@PathVariable Long id) {
-        Producer producer = producerService.findByIdOrThrowNotFound(id);
+        Producer producer = service.findByIdOrThrowNotFound(id);
 
         ProducerGetResponse producerGetResponse = MAPPER.toProducerGetResponse(producer);
 
@@ -58,7 +57,7 @@ public class ProducerController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        producerService.delete(id);
+        service.delete(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -67,7 +66,7 @@ public class ProducerController {
     public ResponseEntity<Void> update(@RequestBody ProducerPutRequest request) {
         Producer producerUpdated = MAPPER.toProducer(request);
 
-        producerService.update(producerUpdated);
+        service.update(producerUpdated);
 
         return ResponseEntity.noContent().build();
     }
