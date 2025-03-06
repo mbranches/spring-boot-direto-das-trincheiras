@@ -3,6 +3,7 @@ package academy.devdojo.controller;
 import academy.devdojo.mapper.ProducerMapper;
 import academy.devdojo.model.Producer;
 import academy.devdojo.requests.ProducerPostRequest;
+import academy.devdojo.requests.ProducerPutRequest;
 import academy.devdojo.response.ProducerGetResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -64,6 +65,22 @@ public class ProducerController {
                 .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer not Found"));
 
         producers.remove(producerToBeDeleted);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> update(@RequestBody ProducerPutRequest request) {
+        List<Producer> producers = Producer.getProducers();
+        Producer produceToBeDeleted = producers.stream()
+                .filter(p -> p.getId().equals(request.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produce not Found"));
+
+        Producer producerUpdated = MAPPER.toProducer(request, produceToBeDeleted.getCreatedAt());
+
+        producers.remove(produceToBeDeleted);
+        producers.add(producerUpdated);
 
         return ResponseEntity.noContent().build();
     }
