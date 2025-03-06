@@ -2,82 +2,72 @@ package academy.devdojo.controller;
 
 import academy.devdojo.mapper.ProducerMapper;
 import academy.devdojo.model.Producer;
-import academy.devdojo.repository.ProducerHardCodedRepository;
 import academy.devdojo.requests.ProducerPostRequest;
 import academy.devdojo.requests.ProducerPutRequest;
 import academy.devdojo.response.ProducerGetResponse;
+import academy.devdojo.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @RestController
 @RequestMapping("v1/producers")
 public class ProducerController {
     private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
+    private ProducerService producerService;
+
+    public ProducerController() {
+        this.producerService = new ProducerService();
+    }
 
     @GetMapping
-    public List<ProducerGetResponse> listAll(@RequestParam(required = false) String name) {
-        List<ProducerGetResponse> producerGetResponseList = MAPPER.toProducerGetResponseList(Producer.getProducers());
+    public ResponseEntity<List<ProducerGetResponse>> listAll(@RequestParam(required = false) String name) {
+        List<Producer> producers = producerService.findAll(name);
 
-        if (name == null) return producerGetResponseList;
+        List<ProducerGetResponse> producerGetResponse = MAPPER.toProducerGetResponseList(producers);
 
-        return producerGetResponseList.stream().filter(a -> a.getName().equals(name)).toList();
+        return ResponseEntity.ok(producerGetResponse);
     }
 
     @PostMapping(headers = "x-api-key")
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
-        log.info("{}", headers);
         Producer producer = MAPPER.toProducer(producerPostRequest);
 
-        Producer.addProducer(producer);
+        Producer producerSaved = producerService.save(producer);
 
-
-        ProducerGetResponse response = MAPPER.toProducerGetResponse(producer);
-
+        ProducerGetResponse response = MAPPER.toProducerGetResponse(producerSaved);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
     @GetMapping("{id}")
-    public ProducerGetResponse findById(@PathVariable Long id) {
-        return
-                .map(MAPPER::toProducerGetResponse).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer not Found"));
+    public ResponseEntity<ProducerGetResponse> findById(@PathVariable Long id) {
+        Producer producer = producerService.findByIdOrThrowNotFound(id);
+
+        ProducerGetResponse producerGetResponse = MAPPER.toProducerGetResponse(producer);
+
+        return ResponseEntity.ok(producerGetResponse);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-
-        Producer producerToBeDeleted = producers.stream()
-                .filter(producer -> producer.getId().equals(id))
-                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer not Found"));
-
-        .delete(producerToBeDeleted);
+        producerService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
     public ResponseEntity<Void> update(@RequestBody ProducerPutRequest request) {
-        Producer produceToBeDeleted = producers.stream()
-                .filter(p -> p.getId().equals(request.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produce not Found"));
+        Producer producerUpdated = MAPPER.toProducer(request);
 
-        Producer producerUpdated = MAPPER.toProducer(request, produceToBeDeleted.getCreatedAt());
-
-        producers.remove(produceToBeDeleted);
-        producers.add(producerUpdated);
+        producerService.update(producerUpdated);
 
         return ResponseEntity.noContent().build();
     }

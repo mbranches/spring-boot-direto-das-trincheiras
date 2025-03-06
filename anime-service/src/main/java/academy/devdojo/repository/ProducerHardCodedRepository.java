@@ -2,6 +2,7 @@ package academy.devdojo.repository;
 
 import academy.devdojo.model.Producer;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class ProducerHardCodedRepository {
     private static final List<Producer> PRODUCERS = new ArrayList<>();
 
@@ -20,7 +22,7 @@ public class ProducerHardCodedRepository {
         PRODUCERS.addAll(List.of(mappa, kyoto, madHouse));
     }
 
-    public static List<Producer> findAll() {
+    public List<Producer> findAll() {
         return PRODUCERS;
     }
 
@@ -30,10 +32,10 @@ public class ProducerHardCodedRepository {
                 .findFirst();
     }
 
-    public Optional<Producer> findByName(String name) {
+    public List<Producer> findByName(String name) {
         return PRODUCERS.stream()
                 .filter(a -> a.getName().equals(name))
-                .findFirst();
+                .toList();
     }
 
     public Producer save(Producer producer) {
