@@ -2,6 +2,7 @@ package academy.devdojo.controller;
 
 import academy.devdojo.mapper.ProducerMapper;
 import academy.devdojo.model.Producer;
+import academy.devdojo.repository.ProducerHardCodedRepository;
 import academy.devdojo.requests.ProducerPostRequest;
 import academy.devdojo.requests.ProducerPutRequest;
 import academy.devdojo.response.ProducerGetResponse;
@@ -50,28 +51,24 @@ public class ProducerController {
 
     @GetMapping("{id}")
     public ProducerGetResponse findById(@PathVariable Long id) {
-        return Producer.getProducers().stream()
-                .filter(a -> a.getId().equals(id))
-                .map(MAPPER::toProducerGetResponse)
-                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer not Found"));
+        return
+                .map(MAPPER::toProducerGetResponse).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer not Found"));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        List<Producer> producers = Producer.getProducers();
 
         Producer producerToBeDeleted = producers.stream()
                 .filter(producer -> producer.getId().equals(id))
                 .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer not Found"));
 
-        producers.remove(producerToBeDeleted);
+        .delete(producerToBeDeleted);
 
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
     public ResponseEntity<Void> update(@RequestBody ProducerPutRequest request) {
-        List<Producer> producers = Producer.getProducers();
         Producer produceToBeDeleted = producers.stream()
                 .filter(p -> p.getId().equals(request.getId()))
                 .findFirst()
