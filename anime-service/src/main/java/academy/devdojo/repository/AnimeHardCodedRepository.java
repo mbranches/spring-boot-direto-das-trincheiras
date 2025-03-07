@@ -2,44 +2,41 @@ package academy.devdojo.repository;
 
 import academy.devdojo.model.Anime;
 import academy.devdojo.model.Producer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Repository
 public class AnimeHardCodedRepository {
-    public static final List<Anime> ANIMES = new ArrayList<>(List.of(
-            new Anime(1L, "Naruto"),
-            new Anime(2L, "Dbz"),
-            new Anime(3L, "Boku no Hero"),
-            new Anime(4L, "Boruto")
-            ));
+    public final AnimeData animeData;
 
     public List<Anime> findAll() {
-        return ANIMES;
+        return animeData.getANIMES();
     }
 
     public Optional<Anime> findById(Long id) {
-        return ANIMES.stream()
+        return animeData.getANIMES().stream()
                 .filter(a -> a.getId().equals(id))
                 .findFirst();
     }
 
     public List<Anime> findByName(String name) {
-        return ANIMES.stream()
+        return animeData.getANIMES().stream()
                 .filter(a -> a.getName().equals(name))
                 .toList();
     }
 
     public Anime save(Anime producer) {
-        ANIMES.add(producer);
+        animeData.getANIMES().add(producer);
         return producer;
     }
 
     public void delete(Anime producer) {
-        ANIMES.remove(producer);
+        animeData.getANIMES().remove(producer);
 
     }
 
