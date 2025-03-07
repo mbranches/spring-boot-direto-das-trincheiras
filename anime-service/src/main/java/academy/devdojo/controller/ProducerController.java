@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("v1/producers")
 @RequiredArgsConstructor  //cria um constutor para todos os atributos finais
 public class ProducerController {
-    private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
+    private final ProducerMapper MAPPER;
     private final ProducerService service;
 
     @GetMapping
