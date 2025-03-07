@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("v1/animes")
 @RequiredArgsConstructor
 public class AnimeController {
-    private static final AnimeMapper MAPPER = AnimeMapper.INSTANCE;
+    private final AnimeMapper MAPPER;
     private final AnimeService service;
 
     @GetMapping
