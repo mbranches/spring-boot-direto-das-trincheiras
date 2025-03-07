@@ -8,8 +8,6 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -91,5 +89,52 @@ class ProducerHardCodedRepositoryTest {
                 .isNotEmpty();
 
         Assertions.assertThat(producers.get(0).getName()).isEqualTo(producerExpectedName);
+    }
+
+    @Test
+    @DisplayName("save creates producer when successful")
+    @Order(5)
+    void save_CreatesProducer_WhenSuccessful() {
+        Producer producerToSave = Producer.builder().id(99L).name("MAPPA").createdAt(LocalDateTime.now()).build();
+        Producer producerSaved = repository.save(producerToSave);
+
+        Assertions.assertThat(producerSaved).isNotNull()
+                .isEqualTo(producerToSave)
+                .hasNoNullFieldsOrProperties();
+
+        Optional<Producer> producerSavedInList = repository.findById(producerSaved.getId());
+        Assertions.assertThat(producerSavedInList)
+                .isPresent()
+                .contains(producerToSave);
+    }
+
+    @Test
+    @DisplayName("delete removes producer when successful")
+    @Order(6)
+    void delete_RemovesProducer_WhenSuccessful() {
+        Producer producerToDelete = PRODUCERS_LIST.get(0);
+
+        repository.delete(producerToDelete);
+
+        List<Producer> producers = repository.findAll();
+
+        Assertions.assertThat(producers).isNotEmpty().doesNotContain(producerToDelete);
+    }
+
+    @Test
+    @DisplayName("update updates producer when successful")
+    @Order(7)
+    void update_UpdatesProducer_WhenSuccessful() {
+        Producer producerToUpdate = PRODUCERS_LIST.get(0);
+        producerToUpdate.setName("Aniplex");
+
+        repository.update(producerToUpdate);
+
+        Assertions.assertThat(this.PRODUCERS_LIST).contains(producerToUpdate);
+
+        Optional<Producer> producerUpdated = repository.findById(producerToUpdate.getId());
+        Assertions.assertThat(producerUpdated).isPresent();
+
+        Assertions.assertThat(producerUpdated.get().getName()).isEqualTo(producerToUpdate.getName());
     }
 }
