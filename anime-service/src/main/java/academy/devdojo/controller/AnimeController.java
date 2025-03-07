@@ -6,10 +6,10 @@ import academy.devdojo.requests.AnimePostRequest;
 import academy.devdojo.requests.AnimePutRequest;
 import academy.devdojo.response.AnimeGetResponse;
 import academy.devdojo.service.AnimeService;
-import academy.devdojo.service.AnimeService;
+import external.dependency.Connection;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +17,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
+@Log4j2
 @RestController
 @RequestMapping("v1/animes")
 @RequiredArgsConstructor
 public class AnimeController {
+    private final Connection CONNECTION;
     private final AnimeMapper MAPPER;
-    private final AnimeService service;
+    private final AnimeService SERVICE;
 
     @GetMapping
     public ResponseEntity<List<AnimeGetResponse>> listAll(@RequestParam(required = false) String name) {
-        List<Anime> animes = service.findAll(name);
+        log.info(CONNECTION);
+        List<Anime> animes = SERVICE.findAll(name);
 
         List<AnimeGetResponse> animeGetResponse = MAPPER.toAnimeGetResponseList(animes);
 
@@ -38,7 +40,7 @@ public class AnimeController {
     public ResponseEntity<AnimeGetResponse> save(@RequestBody AnimePostRequest animePostRequest, @RequestHeader HttpHeaders headers) {
         Anime anime = MAPPER.toAnime(animePostRequest);
 
-        Anime animeSaved = service.save(anime);
+        Anime animeSaved = SERVICE.save(anime);
 
         AnimeGetResponse response = MAPPER.toAnimeGetResponse(animeSaved);
 
@@ -48,7 +50,7 @@ public class AnimeController {
 
     @GetMapping("{id}")
     public ResponseEntity<AnimeGetResponse> findById(@PathVariable Long id) {
-        Anime anime = service.findByIdOrThrowNotFound(id);
+        Anime anime = SERVICE.findByIdOrThrowNotFound(id);
 
         AnimeGetResponse animeGetResponse = MAPPER.toAnimeGetResponse(anime);
 
@@ -57,7 +59,7 @@ public class AnimeController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        service.delete(id);
+        SERVICE.delete(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -66,7 +68,7 @@ public class AnimeController {
     public ResponseEntity<Void> update(@RequestBody AnimePutRequest request) {
         Anime animeUpdated = MAPPER.toAnime(request);
 
-        service.update(animeUpdated);
+        SERVICE.update(animeUpdated);
 
         return ResponseEntity.noContent().build();
     }
