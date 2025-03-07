@@ -2,16 +2,20 @@ package academy.devdojo.service;
 
 import academy.devdojo.model.Producer;
 import academy.devdojo.repository.ProducerHardCodedRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Service
 public class ProducerService {
-    ProducerHardCodedRepository repository;
+    private final ProducerHardCodedRepository repository;
 
-    public ProducerService() {
-        this.repository = new ProducerHardCodedRepository();
+    @Autowired
+    public ProducerService(ProducerHardCodedRepository repository) {
+        this.repository = repository;
     }
 
     public List<Producer> findAll(String name) {

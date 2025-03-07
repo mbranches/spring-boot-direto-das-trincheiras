@@ -6,7 +6,9 @@ import academy.devdojo.requests.ProducerPostRequest;
 import academy.devdojo.requests.ProducerPutRequest;
 import academy.devdojo.response.ProducerGetResponse;
 import academy.devdojo.service.ProducerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("v1/producers")
+@RequiredArgsConstructor  //cria um constutor para todos os atributos finais
 public class ProducerController {
     private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
-    private ProducerService service;
-
-    public ProducerController() {
-        this.service = new ProducerService();
-    }
+    private final ProducerService service;
 
     @GetMapping
     public ResponseEntity<List<ProducerGetResponse>> listAll(@RequestParam(required = false) String name) {

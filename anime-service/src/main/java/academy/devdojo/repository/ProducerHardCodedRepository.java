@@ -1,10 +1,8 @@
 package academy.devdojo.repository;
 
 import academy.devdojo.model.Producer;
-import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
