@@ -5,6 +5,7 @@ import academy.devdojo.model.Producer;
 import academy.devdojo.requests.ProducerPostRequest;
 import academy.devdojo.requests.ProducerPutRequest;
 import academy.devdojo.response.ProducerGetResponse;
+import academy.devdojo.response.ProducerPostResponse;
 import academy.devdojo.service.ProducerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,12 +36,12 @@ public class ProducerController {
     }
 
     @PostMapping(headers = "x-api-key")
-    public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<ProducerPostResponse> save(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
         Producer producer = MAPPER.toProducer(producerPostRequest);
 
         Producer producerSaved = service.save(producer);
 
-        ProducerGetResponse response = MAPPER.toProducerGetResponse(producerSaved);
+        ProducerPostResponse response = MAPPER.toProducerPostResponse(producerSaved);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
