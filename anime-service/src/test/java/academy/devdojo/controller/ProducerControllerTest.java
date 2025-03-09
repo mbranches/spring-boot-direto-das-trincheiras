@@ -5,10 +5,8 @@ import academy.devdojo.model.Producer;
 import academy.devdojo.repository.ProducerData;
 import academy.devdojo.repository.ProducerHardCodedRepository;
 import academy.devdojo.service.ProducerService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.mockito.BDDMockito;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -55,7 +53,7 @@ class ProducerControllerTest {
     }
 
     @Test
-    @DisplayName("findAll returns a list with all produces when name is null")
+    @DisplayName("GET /v1/producers returns a list with all produces when name is null")
     @Order(1)
     void findAll_ReturnSAllProducers_WhenArgumentIsNull() throws Exception {
         String responseExpected = readResourceFile("producer/get-producer-null-name-200.json");
@@ -64,6 +62,56 @@ class ProducerControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(responseExpected));
+    }
+
+    @Test
+    @DisplayName("GET /v1/producers?name=Ufotable returns list with found object when name exists")
+    @Order(2)
+    void findAll_ReturnsFoundProducerInList_WhenNameExists() throws Exception {
+        String responseExpected = readResourceFile("producer/get-producer-ufotable-name-200.json");
+        String name = "Ufotable";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers").param("name", name))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(responseExpected));
+    }
+
+    @Test
+    @DisplayName("GET /v1/producers?name=NomeQueNaoExiste returns empty list when name is not found")
+    @Order(3)
+    void findAll_ReturnsEmptyList_WhenNameNotFound() throws Exception{
+        String responseExpected = readResourceFile("producer/get-producer-nomequenaoexiste-name-200.json");
+        String name = "NomeQueNaoExiste";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers").param("name", name))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(responseExpected));
+    }
+
+    @Test
+    @DisplayName("GET /v1/producers/1 returns producer found when successful")
+    @Order(4)
+    void findById_ReturnsProducerFound_WhenSuccessful() throws Exception{
+        String responseExpected = readResourceFile("producer/get-producer-by-id-200.json");
+        Long id = 1L;
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers/{id}",id))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(responseExpected));
+    }
+
+    @Test
+    @DisplayName("GET /v1/producers/99 throws ResponseStatusException 404 when producer not found")
+    @Order(5)
+    void findById_ThrowsResponseStatusException_WhenProducerNotFound() throws Exception{
+        Long randomId = 99L;
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers/{id}", randomId))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
+        //Body vem vazio
     }
 
     private String readResourceFile(String fileName) throws IOException {

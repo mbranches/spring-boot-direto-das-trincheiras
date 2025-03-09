@@ -1,1 +1,17 @@
-  [{"id":1,"name":"Ufotable","createdAt":"2025-03-09T11:05:34.1311715"},{"id":2,"name":"Wit Studio","createdAt":"2025-03-09T11:05:34.1311715"},{"id":3,"name":"Studio Giblin","createdAt":"2025-03-09T11:05:34.1311715"}]
+[
+  {
+    "id": 1,
+    "name": "Ufotable",
+    "createdAt": "2025-03-09T11:05:34.1311715"
+  },
+  {
+    "id": 2,
+    "name": "Wit Studio",
+    "createdAt": "2025-03-09T11:05:34.1311715"
+  },
+  {
+    "id": 3,
+    "name": "Studio Giblin",
+    "createdAt": "2025-03-09T11:05:34.1311715"
+  }
+]
