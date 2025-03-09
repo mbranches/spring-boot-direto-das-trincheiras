@@ -5,6 +5,7 @@ import academy.devdojo.model.Anime;
 import academy.devdojo.requests.AnimePostRequest;
 import academy.devdojo.requests.AnimePutRequest;
 import academy.devdojo.response.AnimeGetResponse;
+import academy.devdojo.response.AnimePostResponse;
 import academy.devdojo.service.AnimeService;
 import external.dependency.Connection;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +38,12 @@ public class AnimeController {
     }
 
     @PostMapping
-    public ResponseEntity<AnimeGetResponse> save(@RequestBody AnimePostRequest animePostRequest, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<AnimePostResponse> save(@RequestBody AnimePostRequest animePostRequest, @RequestHeader HttpHeaders headers) {
         Anime anime = MAPPER.toAnime(animePostRequest);
 
         Anime animeSaved = SERVICE.save(anime);
 
-        AnimeGetResponse response = MAPPER.toAnimeGetResponse(animeSaved);
+        AnimePostResponse response = MAPPER.toAnimePostResponse(animeSaved);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
