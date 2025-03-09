@@ -5,14 +5,19 @@ import academy.devdojo.model.Producer;
 import academy.devdojo.repository.ProducerData;
 import academy.devdojo.repository.ProducerHardCodedRepository;
 import academy.devdojo.service.ProducerService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -32,6 +37,8 @@ import java.util.List;
 class ProducerControllerTest {
     @MockBean //No contexto do spring utilizar esse
     private ProducerData producerData;
+    @SpyBean
+    private ProducerHardCodedRepository repository;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -112,6 +119,27 @@ class ProducerControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
         //Body vem vazio
+    }
+
+    @Test
+    @DisplayName("POST /v1/producer returns the created producer when successful")
+    @Order(6)
+    void save_ReturnsCreatedProducer_WhenSuccessful() throws Exception {
+        Producer producerToBeSaved = Producer.builder().id(99L).name("MAPPA").createdAt(LocalDateTime.now()).build();
+        BDDMockito.when(repository.save(ArgumentMatchers.any(Producer.class))).thenReturn(producerToBeSaved);
+
+        String request = readResourceFile("producer/post-request-producer-200.json");
+        String responseExpected = readResourceFile("producer/post-response-producer-201.json");
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/producers")
+                        .header("x-api-key", "v1")
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE) //padrão
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().json(responseExpected));
     }
 
     private String readResourceFile(String fileName) throws IOException {
