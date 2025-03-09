@@ -5,7 +5,6 @@ import academy.devdojo.model.Producer;
 import academy.devdojo.repository.ProducerData;
 import academy.devdojo.repository.ProducerHardCodedRepository;
 import academy.devdojo.service.ProducerService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -122,7 +120,7 @@ class ProducerControllerTest {
     }
 
     @Test
-    @DisplayName("POST /v1/producer returns the created producer when successful")
+    @DisplayName("POST /v1/producers returns the created producer when successful")
     @Order(6)
     void save_ReturnsCreatedProducer_WhenSuccessful() throws Exception {
         Producer producerToBeSaved = Producer.builder().id(99L).name("MAPPA").createdAt(LocalDateTime.now()).build();
@@ -135,12 +133,67 @@ class ProducerControllerTest {
                         .post("/v1/producers")
                         .header("x-api-key", "v1")
                         .content(request)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE) //padrão
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().json(responseExpected));
     }
+
+    @Test
+    @DisplayName("PUT /v1/producers updates producer when successful")
+    @Order(7)
+    void update_UpdatesProducer_WhenSuccessful() throws Exception {
+        String request = readResourceFile("producer/put-request-producer-200.json");
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/v1/producers")
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent() );
+    }
+
+    @Test
+    @DisplayName("PUT /v1/producers throws ResponseStatusException when producer is not found")
+    @Order(8)
+    void update_ThrowsResponseStatusException_WhenProducerIsNotFound() throws Exception {
+        String request = readResourceFile("producer/put-request-producer-404.json");
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/v1/producers")
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
+    }
+
+    @Test
+    @DisplayName("DELETE /v1/producers/1 removes producer when successful")
+    @Order(9)
+    void delete_RemovesProducer_WhenSuccessful() throws Exception {
+        Producer producerToBeDeleted = this.PRODUCERS_LIST.get(0);
+        Long idToBeDeleted = producerToBeDeleted.getId();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/producers/{id}", idToBeDeleted))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("DELETE /v1/producers/99 throws ResponseStatusException when producer is not found")
+    @Order(10)
+    void delete_ThrowsResponseStatusException_WhenProducerIsNotFound() throws Exception {
+        Long randomId = 99L;
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/producers/{id}", randomId))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
+    }
+
 
     private String readResourceFile(String fileName) throws IOException {
         File file = resourceLoader.getResource("classpath:%s".formatted(fileName)).getFile();
