@@ -7,10 +7,8 @@ import academy.devdojo.requests.AnimePutRequest;
 import academy.devdojo.response.AnimeGetResponse;
 import academy.devdojo.response.AnimePostResponse;
 import academy.devdojo.service.AnimeService;
-import external.dependency.Connection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +21,11 @@ import java.util.List;
 @RequestMapping("v1/animes")
 @RequiredArgsConstructor
 public class AnimeController {
-    private final Connection CONNECTION;
     private final AnimeMapper MAPPER;
     private final AnimeService SERVICE;
 
     @GetMapping
-    public ResponseEntity<List<AnimeGetResponse>> listAll(@RequestParam(required = false) String name) {
-        log.info(CONNECTION);
+    public ResponseEntity<List<AnimeGetResponse>> findAll(@RequestParam(required = false) String name) {
         List<Anime> animes = SERVICE.findAll(name);
 
         List<AnimeGetResponse> animeGetResponse = MAPPER.toAnimeGetResponseList(animes);
