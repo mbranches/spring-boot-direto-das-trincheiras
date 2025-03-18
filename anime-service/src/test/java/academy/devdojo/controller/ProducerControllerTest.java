@@ -123,8 +123,8 @@ class ProducerControllerTest {
     @DisplayName("POST /v1/producers returns the created producer when successful")
     @Order(6)
     void save_ReturnsCreatedProducer_WhenSuccessful() throws Exception {
-        Producer producerToBeSaved = Producer.builder().id(99L).name("MAPPA").createdAt(LocalDateTime.now()).build();
-        BDDMockito.when(repository.save(ArgumentMatchers.any(Producer.class))).thenReturn(producerToBeSaved);
+        Producer producerSaved = Producer.builder().id(99L).name("MAPPA").createdAt(LocalDateTime.now()).build();
+        BDDMockito.when(repository.save(ArgumentMatchers.any(Producer.class))).thenReturn(producerSaved);
 
         String request = readResourceFile("producer/post-request-producer-200.json");
         String responseExpected = readResourceFile("producer/post-response-producer-201.json");
