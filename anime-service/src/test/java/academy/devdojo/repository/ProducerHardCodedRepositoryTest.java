@@ -1,6 +1,7 @@
 package academy.devdojo.repository;
 
 import academy.devdojo.model.Producer;
+import academy.devdojo.utils.ProducerUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,8 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,17 +23,16 @@ class ProducerHardCodedRepositoryTest {
     private ProducerHardCodedRepository repository;
     @Mock
     private ProducerData producerData;
+    @InjectMocks
+    private ProducerUtils producerUtils;
 
-    private final List<Producer> PRODUCERS_LIST = new ArrayList<>();
+    private List<Producer> producerList;
 
     @BeforeEach
     void init() {
-        Producer ufotable = Producer.builder().id(1L).name("Ufotable").createdAt(LocalDateTime.now()).build();
-        Producer witStudio = Producer.builder().id(2L).name("Wit Studio").createdAt(LocalDateTime.now()).build();
-        Producer studioGiblin = Producer.builder().id(3L).name("Studio Giblin").createdAt(LocalDateTime.now()).build();
-        PRODUCERS_LIST.addAll(List.of(ufotable, witStudio, studioGiblin));
+        producerList = producerUtils.newProducerList();
 
-        BDDMockito.when(producerData.getPRODUCERS()).thenReturn(PRODUCERS_LIST);
+        BDDMockito.when(producerData.getPRODUCERS()).thenReturn(producerList);
     }
 
     @Test
@@ -45,7 +43,7 @@ class ProducerHardCodedRepositoryTest {
         List<Producer> producers = repository.findAll();
         Assertions.assertThat(producers)
                 .isNotNull()
-                .hasSameElementsAs(PRODUCERS_LIST); //compara pelo equalsAndHashCode
+                .hasSameElementsAs(producerList); //compara pelo equalsAndHashCode
     }
 
     @Test
@@ -53,7 +51,7 @@ class ProducerHardCodedRepositoryTest {
     @Order(2)
     void findById_ReturnsProducerById_WhenSuccessful() {
 
-        Producer expectedProducer = PRODUCERS_LIST.get(0);
+        Producer expectedProducer = producerList.get(0);
 
         Optional<Producer> producers = repository.findById(1L);
 
@@ -79,7 +77,7 @@ class ProducerHardCodedRepositoryTest {
     @Order(4)
     void findByName_ReturnsFoundProducerInList_WhenNameExists() {
 
-        Producer producerExpected = PRODUCERS_LIST.get(0);
+        Producer producerExpected = producerList.get(0);
         String producerExpectedName = producerExpected.getName();
 
         List<Producer> producers = repository.findByName(producerExpectedName);
@@ -95,7 +93,7 @@ class ProducerHardCodedRepositoryTest {
     @DisplayName("save creates producer when successful")
     @Order(5)
     void save_CreatesProducer_WhenSuccessful() {
-        Producer producerToSave = Producer.builder().id(99L).name("MAPPA").createdAt(LocalDateTime.now()).build();
+        Producer producerToSave = producerUtils.newProducerToSave();
         Producer producerSaved = repository.save(producerToSave);
 
         Assertions.assertThat(producerSaved).isNotNull()
@@ -112,7 +110,7 @@ class ProducerHardCodedRepositoryTest {
     @DisplayName("delete removes producer when successful")
     @Order(6)
     void delete_RemovesProducer_WhenSuccessful() {
-        Producer producerToDelete = PRODUCERS_LIST.get(0);
+        Producer producerToDelete = producerList.get(0);
 
         repository.delete(producerToDelete);
 
@@ -125,12 +123,12 @@ class ProducerHardCodedRepositoryTest {
     @DisplayName("update updates producer when successful")
     @Order(7)
     void update_UpdatesProducer_WhenSuccessful() {
-        Producer producerToUpdate = PRODUCERS_LIST.get(0);
+        Producer producerToUpdate = producerList.get(0);
         producerToUpdate.setName("Aniplex");
 
         repository.update(producerToUpdate);
 
-        Assertions.assertThat(this.PRODUCERS_LIST).contains(producerToUpdate);
+        Assertions.assertThat(this.producerList).contains(producerToUpdate);
 
         Optional<Producer> producerUpdated = repository.findById(producerToUpdate.getId());
         Assertions.assertThat(producerUpdated).isPresent();

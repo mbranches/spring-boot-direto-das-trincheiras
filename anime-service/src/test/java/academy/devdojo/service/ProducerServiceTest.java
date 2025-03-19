@@ -2,8 +2,8 @@ package academy.devdojo.service;
 
 import academy.devdojo.model.Producer;
 import academy.devdojo.repository.ProducerHardCodedRepository;
+import academy.devdojo.utils.ProducerUtils;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -27,33 +26,32 @@ class ProducerServiceTest {
     private ProducerService service;
     @Mock
     private ProducerHardCodedRepository repository;
-    private final List<Producer> PRODUCERS_LIST = new ArrayList<>();
+    @InjectMocks
+    private ProducerUtils producerUtils;
+    private List<Producer> producerList;
 
     @BeforeEach
     void init() {
-        Producer ufotable = Producer.builder().id(1L).name("Ufotable").createdAt(LocalDateTime.now()).build();
-        Producer witStudio = Producer.builder().id(2L).name("Wit Studio").createdAt(LocalDateTime.now()).build();
-        Producer studioGiblin = Producer.builder().id(3L).name("Studio Giblin").createdAt(LocalDateTime.now()).build();
-        PRODUCERS_LIST.addAll(List.of(ufotable, witStudio, studioGiblin));
+        producerList = producerUtils.newProducerList();
     }
 
     @Test
     @DisplayName("findAll returns a list with all produces when name is null")
     @Order(1)
     void findAll_ReturnSAllProducers_WhenArgumentIsNull() {
-        BDDMockito.when(repository.findAll()).thenReturn(PRODUCERS_LIST);
+        BDDMockito.when(repository.findAll()).thenReturn(producerList);
 
         List<Producer> producers = service.findAll(null);
         Assertions.assertThat(producers)
                 .isNotNull()
-                .hasSameElementsAs(PRODUCERS_LIST); //compara pelo equalsAndHashCode
+                .hasSameElementsAs(producerList); //compara pelo equalsAndHashCode
     }
 
     @Test
     @DisplayName("findAll returns list with found object when name exists")
     @Order(2)
     void findAll_ReturnsFoundProducerInList_WhenNameExists() {
-        Producer expectedProducer = PRODUCERS_LIST.get(0);
+        Producer expectedProducer = producerList.get(0);
         String expectedProducerName = expectedProducer.getName();
         List<Producer> expectedList = Collections.singletonList(expectedProducer);
 
@@ -85,7 +83,7 @@ class ProducerServiceTest {
     @DisplayName("findByIdOrThrowNotFound returns a producer with given id when successful")
     @Order(4)
     void findByIdOrThrowNotFound_ReturnsProducerById_WhenSuccessful() {
-        Producer expectedProducer = PRODUCERS_LIST.get(0);
+        Producer expectedProducer = producerList.get(0);
         Long idToBeFound = expectedProducer.getId();
         BDDMockito.when(repository.findById(idToBeFound)).thenReturn(Optional.of(expectedProducer));
 
@@ -111,7 +109,7 @@ class ProducerServiceTest {
     @DisplayName("save returns the created producer when successful")
     @Order(6)
     void save_ReturnsCreatedProducer_WhenSuccessful() {
-        Producer producerToBeSaved = Producer.builder().id(99L).name("new Producer").createdAt(LocalDateTime.now()).build();
+        Producer producerToBeSaved = producerUtils.newProducerToSave();
         BDDMockito.when(repository.save(producerToBeSaved)).thenReturn(producerToBeSaved);
 
         Producer savedProducer = service.save(producerToBeSaved);
@@ -126,7 +124,7 @@ class ProducerServiceTest {
     @DisplayName("delete removes producer when successful")
     @Order(7)
     void delete_RemovesProducer_WhenSuccessful() {
-        Producer producerToBeDeleted = PRODUCERS_LIST.get(0);
+        Producer producerToBeDeleted = producerList.get(0);
         Long idToBeDeleted = producerToBeDeleted.getId();
         BDDMockito.when(repository.findById(idToBeDeleted)).thenReturn(Optional.of(producerToBeDeleted));
 
@@ -151,7 +149,7 @@ class ProducerServiceTest {
     @DisplayName("update updates producer when successful")
     @Order(9)
     void update_UpdatesProducer_WhenSuccessful() {
-        Producer producerToBeUpdated = PRODUCERS_LIST.get(0);
+        Producer producerToBeUpdated = producerList.get(0);
         producerToBeUpdated.setName("New name for producer");
         Long idToBeUpdated = producerToBeUpdated.getId();
 
@@ -165,7 +163,7 @@ class ProducerServiceTest {
     @DisplayName("update throws ResponseStatusException when producer is not found")
     @Order(10)
     void update_ThrowsResponseStatusException_WhenProducerIsNotFound() {
-        Producer producerToBeUpdated = PRODUCERS_LIST.get(0);
+        Producer producerToBeUpdated = producerList.get(0);
 
         BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
 
