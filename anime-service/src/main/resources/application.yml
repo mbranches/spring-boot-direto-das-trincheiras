@@ -4,8 +4,6 @@ spring:
   threads:
     virtual:
       enabled: true
-
-
 server:
   servlet:
     context-path: / #default
@@ -14,6 +12,7 @@ server:
   tomcat:
     threads: #threads de plataforma
       max: 20 #padrão é 200 -> diminuindo o numero de threads e habilitando as virtuals aumenta muito a performace com menos memoria
+
 logging:
   level:
     academy.devdojo: debug
