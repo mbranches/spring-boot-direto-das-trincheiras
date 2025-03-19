@@ -2,6 +2,7 @@ package academy.devdojo.service;
 
 import academy.devdojo.model.Anime;
 import academy.devdojo.repository.AnimeHardCodedRepository;
+import academy.devdojo.utils.AnimeUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -22,38 +22,36 @@ import java.util.Optional;
 public class AnimeServiceTest {
     @InjectMocks
     private AnimeService service;
+    @InjectMocks
+    private AnimeUtils animeUtils;
     @Mock
     private AnimeHardCodedRepository repository;
-    private final List<Anime> ANIMES_LIST = new ArrayList<>();
+    private List<Anime> animeList;
 
     @BeforeEach
     void init() {
-        Anime anime1 = new Anime(1L, "Attack on Titan");
-        Anime anime2 = new Anime(2L, "Naruto");
-        Anime anime3 = new Anime(3L, "Demon Slayer");
-        ANIMES_LIST.addAll(List.of(anime1, anime2, anime3));
-
+        animeList = animeUtils.newAnimeList();
     }
 
     @Test
     @Order(1)
     @DisplayName("findAll returns all animes when name is null")
     void findAll_ReturnsAllAnimes_WhenNameIsNull() {
-        BDDMockito.when(repository.findAll()).thenReturn(ANIMES_LIST);
+        BDDMockito.when(repository.findAll()).thenReturn(animeList);
 
         List<Anime> animeList = service.findAll(null);
 
         Assertions.assertThat(animeList)
                 .isNotNull()
                 .isNotEmpty()
-                .containsAnyElementsOf(this.ANIMES_LIST);
+                .containsAnyElementsOf(this.animeList);
     }
 
     @Test
     @Order(2)
     @DisplayName("findAll returns list with found object when name found")
     void findAll_ReturnsListWithFoundObject_WhenNameFound() {
-        Anime expectedAnime = this.ANIMES_LIST.get(0);
+        Anime expectedAnime = this.animeList.get(0);
         String expectedAnimeName = expectedAnime.getName();
         List<Anime> expectedList = Collections.singletonList(expectedAnime);
         BDDMockito.when(repository.findByName(expectedAnimeName)).thenReturn(expectedList);
@@ -83,7 +81,7 @@ public class AnimeServiceTest {
     @Order(4)
     @DisplayName("findByIdOrThrowNotFound returns found anime when successful")
     void findByIdOrThrowNotFound_ReturnsFoundAnime_WhenSuccessful() {
-        Anime expectedAnime = this.ANIMES_LIST.get(0);
+        Anime expectedAnime = this.animeList.get(0);
         Long expectedAnimeId = expectedAnime.getId();
         BDDMockito.when(repository.findById(expectedAnimeId)).thenReturn(Optional.of(expectedAnime));
 
@@ -109,7 +107,7 @@ public class AnimeServiceTest {
     @Order(6)
     @DisplayName("save returns created anime when successful")
     void save_ReturnsCreatedAnime_WhenSuccessful() {
-        Anime animeToBeSaved = Anime.builder().id(99L).name("new Anime").build();
+        Anime animeToBeSaved = animeUtils.newAnimeToSave();
         BDDMockito.when(repository.save(animeToBeSaved)).thenReturn(animeToBeSaved);
 
         Anime savedAnime = service.save(animeToBeSaved);
@@ -124,7 +122,7 @@ public class AnimeServiceTest {
     @Order(7)
     @DisplayName("delete remove anime when successful")
     void delete_RemoveAnime_WhenSuccessful() {
-        Anime animeToBeDeleted = this.ANIMES_LIST.get(0);
+        Anime animeToBeDeleted = this.animeList.get(0);
         Long animeToBeDeletedId = animeToBeDeleted.getId();
 
         BDDMockito.when(repository.findById(animeToBeDeletedId)).thenReturn(Optional.of(animeToBeDeleted));
@@ -148,7 +146,7 @@ public class AnimeServiceTest {
     @Order(9)
     @DisplayName("update updates anime when successful")
     void update_UpdatesAnime_WhenSuccessful() {
-        Anime animeToBeUpdated = this.ANIMES_LIST.get(0);
+        Anime animeToBeUpdated = this.animeList.get(0);
         animeToBeUpdated.setName("new name");
         Long animeToBeUpdatedId = animeToBeUpdated.getId();
 
@@ -162,7 +160,7 @@ public class AnimeServiceTest {
     @Order(10)
     @DisplayName("update throws ResponseStatusException when id is not found")
     void update_ThrowsResponseStatusException_WhenIdIsNotFound() {
-        Anime animeToBeUpdated = this.ANIMES_LIST.get(0);
+        Anime animeToBeUpdated = this.animeList.get(0);
         animeToBeUpdated.setName("new name");
         BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
 
