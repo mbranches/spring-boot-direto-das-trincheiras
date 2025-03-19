@@ -1,6 +1,7 @@
 package academy.devdojo.repository;
 
 import academy.devdojo.model.Anime;
+import academy.devdojo.utils.AnimeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.assertj.core.api.Assertions;
@@ -11,11 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -23,19 +21,19 @@ class AnimeHardCodedRepositoryTest {
     private static final Logger log = LogManager.getLogger(AnimeHardCodedRepositoryTest.class);
     @InjectMocks
     private AnimeHardCodedRepository repository;
+    @InjectMocks
+    private AnimeUtils animeUtils;
     @Mock
     private AnimeData animeData;
 
-    private final List<Anime> ANIMES_LIST = new ArrayList<>();
+    private List<Anime> animeList;
 
     @BeforeEach
     void init() {
-        Anime anime1 = new Anime(1L, "Attack on Titan");
-        Anime anime2 = new Anime(2L, "Naruto");
-        Anime anime3 = new Anime(3L, "Demon Slayer");
-        ANIMES_LIST.addAll(List.of(anime1, anime2, anime3));
 
-        BDDMockito.when(animeData.getANIMES()).thenReturn(ANIMES_LIST);
+        animeList = animeUtils.newAnimeList();
+
+        BDDMockito.when(animeData.getANIMES()).thenReturn(animeList);
     }
 
     @Test
@@ -47,14 +45,14 @@ class AnimeHardCodedRepositoryTest {
         Assertions.assertThat(animesResponse)
                 .isNotNull()
                 .isNotEmpty()
-                .hasSameElementsAs(this.ANIMES_LIST);
+                .hasSameElementsAs(this.animeList);
     }
 
     @Test
     @DisplayName("findById return an anime with given id when successful")
     @Order(2)
     void findById_ReturnsAnimeById_WhenSuccessful() {
-        Anime animeExpected = this.ANIMES_LIST.get(0);
+        Anime animeExpected = this.animeList.get(0);
 
         Optional<Anime> animeOptional = repository.findById(animeExpected.getId());
 
@@ -67,7 +65,7 @@ class AnimeHardCodedRepositoryTest {
     @DisplayName("findByName return a list of anime with object found when name exists")
     @Order(3)
     void findByName_ReturnsFoundAnimeInList_WhenNameExists() {
-        Anime animeExpected = this.ANIMES_LIST.get(0);
+        Anime animeExpected = this.animeList.get(0);
         String animeExpectedName = animeExpected.getName();
 
         List<Anime> animes = repository.findByName(animeExpectedName);
@@ -94,23 +92,23 @@ class AnimeHardCodedRepositoryTest {
     @Test
     @DisplayName("save creates an anime and return the object created whe successful")
     void save_CreatesAnimeAndReturnsObjectCreated_WhenSuccessful() {
-        Anime animeToBeSaved = new Anime(99L, "Novo Anime");
+        Anime animeToBeSaved = animeUtils.newAnimeToSave();
 
         Anime animeSaved = repository.save(animeToBeSaved);
 
         Assertions.assertThat(animeSaved).isEqualTo(animeToBeSaved).hasNoNullFieldsOrProperties();
 
-        Assertions.assertThat(this.ANIMES_LIST).contains(animeSaved);
+        Assertions.assertThat(this.animeList).contains(animeSaved);
     }
 
     @Test
     @DisplayName("delete removes anime when successful")
     void delete_RemovesAnime_WhenSuccessful() {
-        Anime animeToBeDeleted = this.ANIMES_LIST.get(0);
+        Anime animeToBeDeleted = this.animeList.get(0);
 
         repository.delete(animeToBeDeleted);
 
-        Assertions.assertThat(this.ANIMES_LIST)
+        Assertions.assertThat(this.animeList)
                 .isNotEmpty()
                 .doesNotContain(animeToBeDeleted);
     }
@@ -118,7 +116,7 @@ class AnimeHardCodedRepositoryTest {
     @Test
     @DisplayName("update updates anime when successful")
     void update_UpdatesAnime_WhenSuccessful() {
-        Anime animeToBeUpdated = this.ANIMES_LIST.get(0);
+        Anime animeToBeUpdated = this.animeList.get(0);
         animeToBeUpdated.setName("altered anime");
 
         repository.update(animeToBeUpdated);
