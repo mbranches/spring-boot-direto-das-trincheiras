@@ -91,7 +91,7 @@ class ProducerControllerTest {
     void findById_ReturnsProducerFound_WhenSuccessful() throws Exception{
         String responseExpected = fileUtils.readResourceFile("producer/get-producer-by-id-200.json");
         Long id = 1L;
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers/{id}",id))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}",id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(responseExpected));
@@ -102,7 +102,7 @@ class ProducerControllerTest {
     @Order(5)
     void findById_ThrowsResponseStatusException_WhenProducerNotFound() throws Exception{
         Long randomId = 99L;
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers/{id}", randomId))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", randomId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
