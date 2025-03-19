@@ -1,0 +1,4 @@
+database:
+  url: local:test
+  username: test
+  password: test

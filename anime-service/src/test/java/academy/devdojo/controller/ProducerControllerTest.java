@@ -1,5 +1,7 @@
 package academy.devdojo.controller;
 
+import academy.devdojo.config.Connection;
+import academy.devdojo.config.ConnectionConfiguration;
 import academy.devdojo.mapper.ProducerMapperImpl;
 import academy.devdojo.model.Producer;
 import academy.devdojo.repository.ProducerData;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +29,7 @@ import java.util.List;
 //Slices test -> é parecido com teste de integração, porém starta só os beans mais importantes
 @WebMvcTest(controllers = ProducerController.class) //se não definir, por padrão vai testar para todos os controllers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Import({ProducerMapperImpl.class, ProducerService.class, ProducerHardCodedRepository.class, ProducerData.class, FileUtils.class, ProducerUtils.class}) //não importa por padrões: service, component e repository
+@ComponentScan("academy.devdojo")
 class ProducerControllerTest {
     private static final String URL = "/v1/producers";
     @MockBean //No contexto do spring utilizar esse
