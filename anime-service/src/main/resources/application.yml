@@ -13,9 +13,10 @@ server:
     threads: #threads de plataforma
       max: 20 #padrão é 200 -> diminuindo o numero de threads e habilitando as virtuals aumenta muito a performace com menos memoria
 database:
-  url: localhost:9999
-  username: mongo
-  password: mongo
+  url: ${DB_URL:localhost}:${DB_PORT:3306}
+  username: ${LOCAL_USERNAME:branches}
+  password: ${LOCAL_PASSWORD:root}
+# password: xx  -> eu poderia sobrescrever utilizando a seguinte sintaxe em variaveis de ambiente: DATABASE_PASSWORD=yy
 logging:
   level:
     academy.devdojo: debug
