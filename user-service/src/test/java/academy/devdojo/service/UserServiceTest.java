@@ -94,9 +94,9 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("findByIdOrThrowsNotFoundException throws not found exception when id is not found")
+    @DisplayName("findByIdOrThrowsNotFoundException throws ResponseStatusException when id is not found")
     @Order(5)
-    void findByIdOrThrowsNotFoundException_ThrowsNotFoundException_WhenIdIsNotFound() {
+    void findByIdOrThrowsNotFoundException_ThrowsResponseStatusException_WhenIdIsNotFound() {
         BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
         Long randomId = 1221L;
 
@@ -134,7 +134,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("update throws response status exception when object to update is not found")
+    @DisplayName("update throws ResponseStatusException when object to update is not found")
     @Order(8)
     void update_ThrowsResponseStatusException_WhenObjectToUpdateIsNotFound() {
         User userNotRegistered = userUtils.newUserToBeSaved();
@@ -160,7 +160,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("delete throws response status exception when object to delete is not found")
+    @DisplayName("delete throws ResponseStatusException when object to delete is not found")
     @Order(10)
     void delete_ThrowsResponseStatusException_WhenObjectToDeleteIsNotFound() {
         long randomId = 1255L;
