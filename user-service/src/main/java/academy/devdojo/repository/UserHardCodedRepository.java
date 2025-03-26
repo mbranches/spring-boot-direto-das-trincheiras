@@ -28,6 +28,7 @@ public class UserHardCodedRepository {
     public Optional<User> findById(Long id) {
         List<User> users = userData.getUsers();
         return users.stream()
+                .filter(user -> user.getId().equals(id))
                 .findFirst();
     }
 }

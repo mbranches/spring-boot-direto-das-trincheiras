@@ -61,7 +61,7 @@ class UserHardCodedRepositoryTest {
 
     @Test
     @DisplayName("findAllByName returns an empty list when name is not found")
-    @Order(2)
+    @Order(3)
     void findAllByName_ReturnsEmptyList_WhenNameIsNotFound() {
         String randomName = "name not found";
 
@@ -84,5 +84,17 @@ class UserHardCodedRepositoryTest {
         Assertions.assertThat(response)
                 .isPresent()
                 .containsSame(expectedUser);
+    }
+
+    @Test
+    @DisplayName("findById returns empty optional when id is not found")
+    @Order(5)
+    void findById_ReturnsEmptyOptional_WhenIdIsNotFound() {
+        Long randomId = 455268L;
+
+        Optional<User> response = repository.findById(randomId);
+
+        Assertions.assertThat(response)
+                .isEmpty();
     }
 }

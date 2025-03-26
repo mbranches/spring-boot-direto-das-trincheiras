@@ -6,13 +6,16 @@ import academy.devdojo.utils.UserUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -72,5 +75,32 @@ class UserServiceTest {
         Assertions.assertThat(response)
                 .isNotNull()
                 .isEmpty();
+    }
+
+    @Test
+    @DisplayName("findByIdOrThrowsNotFoundException returns user found when successful")
+    @Order(4)
+    void findByIdOrThrowsNotFoundException_ReturnsUserFound_WhenSuccessful() {
+        User userExpected = userList.get(0);
+        Long idToBeSearched = userExpected.getId();
+
+        BDDMockito.when(repository.findById(idToBeSearched)).thenReturn(Optional.of(userExpected));
+
+        User response = service.findByIdOrThrowsNotFoundException(idToBeSearched);
+
+        Assertions.assertThat(response)
+                .isNotNull()
+                .isEqualTo(userExpected);
+    }
+
+    @Test
+    @DisplayName("findByIdOrThrowsNotFoundException throws not found exception when id is not found")
+    void findByIdOrThrowsNotFoundException_ThrowsNotFoundException_WhenIdIsNotFound() {
+        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
+        Long randomId = 1221L;
+
+        Assertions.assertThatThrownBy(() -> service.findByIdOrThrowsNotFoundException(randomId))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("User not Found");
     }
 }
