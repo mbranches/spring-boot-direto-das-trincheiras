@@ -119,4 +119,56 @@ class UserServiceTest {
                 .isNotNull()
                 .isEqualTo(userToBeSaved);
     }
+
+    @Test
+    @DisplayName("update updates user when successful")
+    @Order(7)
+    void update_UpdatesUser_WhenSuccessful() {
+        User userToBeUpdated = userList.get(0);
+        userToBeUpdated.setFirstName("New First Name");
+
+        BDDMockito.when(repository.findById(userToBeUpdated.getId())).thenReturn(Optional.of(userToBeUpdated));
+        BDDMockito.doNothing().when(repository).update(userToBeUpdated);
+
+        service.update(userToBeUpdated);
+    }
+
+    @Test
+    @DisplayName("update throws response status exception when object to update is not found")
+    @Order(8)
+    void update_ThrowsResponseStatusException_WhenObjectToUpdateIsNotFound() {
+        User userNotRegistered = userUtils.newUserToBeSaved();
+
+        BDDMockito.when(repository.findById(userNotRegistered.getId())).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.update(userNotRegistered))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("User not Found");
+    }
+
+    @Test
+    @DisplayName("delete removes user when successful")
+    @Order(9)
+    void delete_RemovesUser_WhenSuccessful() {
+        User userToBeDeleted = userList.get(0);
+        Long idToBeDeleted = userToBeDeleted.getId();
+
+        BDDMockito.when(repository.findById(idToBeDeleted)).thenReturn(Optional.of(userToBeDeleted));
+        BDDMockito.doNothing().when(repository).delete(userToBeDeleted);
+
+        service.delete(idToBeDeleted);
+    }
+
+    @Test
+    @DisplayName("delete throws response status exception when object to delete is not found")
+    @Order(10)
+    void delete_ThrowsResponseStatusException_WhenObjectToDeleteIsNotFound() {
+        long randomId = 1255L;
+
+        BDDMockito.when(repository.findById(randomId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.delete(randomId))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("User not Found");
+    }
 }
