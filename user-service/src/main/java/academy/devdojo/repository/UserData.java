@@ -14,8 +14,8 @@ public class UserData {
 
     {
         User goku = User.builder().id(1L).firstName("Goku").lastName("Son").email("goku@gmail.com").build();
-        User luan = User.builder().id(1L).firstName("Luan").lastName("Silva").email("luan@gmail.com").build();
-        User marcus = User.builder().id(1L).firstName("Marcus").lastName("Branches").email("marcus@gmail.com").build();
+        User luan = User.builder().id(2L).firstName("Luan").lastName("Silva").email("luan@gmail.com").build();
+        User marcus = User.builder().id(3L).firstName("Marcus").lastName("Branches").email("marcus@gmail.com").build();
 
         users.addAll(List.of(goku, luan, marcus));
     }
