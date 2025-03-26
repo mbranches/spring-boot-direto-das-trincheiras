@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: user-service
+  threads:
+    virtual:
+      enabled: true
+server:
+  error:
+    include-stacktrace: on_param
+  tomcat:
+    threads:
+      max: 20
+  port: 8090
