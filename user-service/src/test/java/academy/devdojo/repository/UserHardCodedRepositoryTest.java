@@ -100,6 +100,7 @@ class UserHardCodedRepositoryTest {
 
     @Test
     @DisplayName("save saves object given when successful")
+    @Order(6)
     void save_SavesObjectGiven_WhenSuccessful() {
         User userToBeSaved = userUtils.newUserToBeSaved();
 
@@ -109,5 +110,33 @@ class UserHardCodedRepositoryTest {
                 .isNotEmpty()
                 .isNotEmpty()
                 .contains(response);
+    }
+
+    @Test
+    @DisplayName("delete removes object given when successful")
+    @Order(7)
+    void delete_RemovesObjectGiven_WhenSuccessful() {
+        User userToBeRemoved = userList.get(0);
+        repository.delete(userToBeRemoved);
+
+        Assertions.assertThat(userList)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContain(userToBeRemoved);
+    }
+
+    @Test
+    @DisplayName("update updates object given when successful")
+    @Order(8)
+    void update_UpdatesObjectGiven_WhenSuccessful() {
+        User userToBeUpdated = userList.get(0);
+        userToBeUpdated.setFirstName("New First Name");
+
+        repository.update(userToBeUpdated);
+
+        Assertions.assertThat(userList)
+                .isNotNull()
+                .isNotEmpty()
+                .contains(userToBeUpdated);
     }
 }

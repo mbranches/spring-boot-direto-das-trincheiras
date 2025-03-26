@@ -6,8 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,5 +33,14 @@ public class UserHardCodedRepository {
     public User save(User user) {
         userData.getUsers().add(user);
         return user;
+    }
+
+    public void delete(User user) {
+        userData.getUsers().remove(user);
+    }
+
+    public void update(User user) {
+        delete(user);
+        save(user);
     }
 }
