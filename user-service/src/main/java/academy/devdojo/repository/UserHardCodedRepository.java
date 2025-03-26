@@ -31,4 +31,9 @@ public class UserHardCodedRepository {
                 .filter(user -> user.getId().equals(id))
                 .findFirst();
     }
+
+    public User save(User user) {
+        userData.getUsers().add(user);
+        return user;
+    }
 }
