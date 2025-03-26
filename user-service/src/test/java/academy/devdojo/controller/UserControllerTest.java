@@ -112,7 +112,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("save returns saved user when successful")
+    @DisplayName("POST /v1/users returns saved user when successful")
     @Order(6)
     void save_ReturnsSavedUser_WhenSuccessful() throws Exception {
         User userSaved = userUtils.newUserToBeSaved();
@@ -129,5 +129,58 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json(response))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
+    }
+
+    @Test
+    @DisplayName("PUT /v1/users updates given user when successful")
+    @Order(7)
+    void update_UpdatesGivenUser_WhenSuccessful() throws Exception {
+        String request = fileUtils.readResourceFile("user/put-request-user-200.json");
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put(URL)
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("PUT /v1/users throws ResponseStatusException when id not exists")
+    void update_ThrowsResponseStatusException_WhenUserNotExists() throws Exception {
+        String request = fileUtils.readResourceFile("user/put-request-user-404.json");
+
+        mockMvc.perform(
+                    MockMvcRequestBuilders.put(URL)
+                            .content(request)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason("User not Found"));
+    }
+
+    @Test
+    @DisplayName("Delete /v1/users/1 removes user when successful")
+    @Order(7)
+    void delete_RemovesUser_WhenSuccessful() throws Exception {
+        User userToBeDeleted = userList.get(0);
+        Long idToBeDeleted = userToBeDeleted.getId();
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", idToBeDeleted))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("Delete /v1/users/randomId throws ResponseStatusException when id not exists")
+    void delete_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception {
+        long randomId = 12121L;
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", randomId))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason("User not Found"));
     }
 }

@@ -2,6 +2,7 @@ package academy.devdojo.mapper;
 
 import academy.devdojo.model.User;
 import academy.devdojo.request.UserPostRequest;
+import academy.devdojo.request.UserPutRequest;
 import academy.devdojo.response.UserGetResponse;
 import academy.devdojo.response.UserPostResponse;
 import org.mapstruct.Mapper;
@@ -18,7 +19,7 @@ public interface UserMapper {
     @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(1, 1_000))")
     User toUser(UserPostRequest userPostRequest);
 
-//    User toUser(UserPutRequest userPutRequest);
+    User toUser(UserPutRequest userPutRequest);
 
     UserPostResponse toUserPostResponse(User user);
 
