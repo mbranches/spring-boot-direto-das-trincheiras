@@ -2,14 +2,19 @@ package academy.devdojo.controller;
 
 import academy.devdojo.model.User;
 import academy.devdojo.repository.UserData;
+import academy.devdojo.repository.UserHardCodedRepository;
+import academy.devdojo.request.UserPostRequest;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.UserUtils;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -25,6 +30,8 @@ class UserControllerTest {
     private final String URL = "/v1/users";
     @Autowired
     private MockMvc mockMvc;
+    @SpyBean
+    private UserHardCodedRepository repository;
     @MockBean
     private UserData userData;
     @Autowired
@@ -102,5 +109,25 @@ class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.status().reason("User not Found"));
+    }
+
+    @Test
+    @DisplayName("save returns saved user when successful")
+    @Order(6)
+    void save_ReturnsSavedUser_WhenSuccessful() throws Exception {
+        User userSaved = userUtils.newUserToBeSaved();
+        BDDMockito.when(repository.save(ArgumentMatchers.any(User.class))).thenReturn(userSaved);
+
+        String request = fileUtils.readResourceFile("user/post-request-user-200.json");
+        String response = fileUtils.readResourceFile("user/post-response-user-201.json");
+        mockMvc.perform(
+                MockMvcRequestBuilders.post(URL)
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().json(response))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
     }
 }

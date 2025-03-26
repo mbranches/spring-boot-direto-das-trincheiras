@@ -97,4 +97,17 @@ class UserHardCodedRepositoryTest {
         Assertions.assertThat(response)
                 .isEmpty();
     }
+
+    @Test
+    @DisplayName("save saves object given when successful")
+    void save_SavesObjectGiven_WhenSuccessful() {
+        User userToBeSaved = userUtils.newUserToBeSaved();
+
+        User response = repository.save(userToBeSaved);
+
+        Assertions.assertThat(userList)
+                .isNotEmpty()
+                .isNotEmpty()
+                .contains(response);
+    }
 }

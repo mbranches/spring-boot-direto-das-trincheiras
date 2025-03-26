@@ -95,6 +95,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("findByIdOrThrowsNotFoundException throws not found exception when id is not found")
+    @Order(5)
     void findByIdOrThrowsNotFoundException_ThrowsNotFoundException_WhenIdIsNotFound() {
         BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
         Long randomId = 1221L;
@@ -102,5 +103,20 @@ class UserServiceTest {
         Assertions.assertThatThrownBy(() -> service.findByIdOrThrowsNotFoundException(randomId))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("User not Found");
+    }
+
+    @Test
+    @DisplayName("save returns saved user when successful")
+    @Order(6)
+    void save_ReturnsSavedUser_WhenSuccessful() {
+        User userToBeSaved = userUtils.newUserToBeSaved();
+
+        BDDMockito.when(repository.save(userToBeSaved)).thenReturn(userToBeSaved);
+
+        User response = service.save(userToBeSaved);
+
+        Assertions.assertThat(response)
+                .isNotNull()
+                .isEqualTo(userToBeSaved);
     }
 }

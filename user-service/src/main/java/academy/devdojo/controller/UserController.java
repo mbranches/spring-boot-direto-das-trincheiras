@@ -2,9 +2,12 @@ package academy.devdojo.controller;
 
 import academy.devdojo.mapper.UserMapper;
 import academy.devdojo.model.User;
+import academy.devdojo.request.UserPostRequest;
 import academy.devdojo.response.UserGetResponse;
+import academy.devdojo.response.UserPostResponse;
 import academy.devdojo.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +35,16 @@ public class UserController {
         UserGetResponse response = mapper.toUserGetResponse(returnedUser);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserPostResponse> save(@RequestBody UserPostRequest userPostRequest) {
+        User userToBeSaved = mapper.toUser(userPostRequest);
+
+        User userSaved = service.save(userToBeSaved);
+
+        UserPostResponse response = mapper.toUserPostResponse(userSaved);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
