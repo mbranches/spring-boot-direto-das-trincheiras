@@ -6,6 +6,7 @@ import academy.devdojo.repository.UserHardCodedRepository;
 import academy.devdojo.request.UserPostRequest;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.UserUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -128,7 +130,6 @@ class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.content().json(response))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
-
     }
 
     @Test
@@ -182,5 +183,59 @@ class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.status().reason("User not Found"));
+    }
+
+    @Test
+    @DisplayName("POST /v1/users returns bad request when fields are empty")
+    @Order(11)
+    void save_ReturnsBadRequest_WhenFieldsAreEmpty() throws Exception {
+        User userSaved = userUtils.newUserToBeSaved();
+        BDDMockito.when(repository.save(ArgumentMatchers.any(User.class))).thenReturn(userSaved);
+
+        String request = fileUtils.readResourceFile("user/post-request-user-empty-fields-400.json");
+        MvcResult mvcResult = mockMvc.perform(
+                        MockMvcRequestBuilders.post(URL)
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        Exception resolvedException = mvcResult.getResolvedException();
+        Assertions.assertThat(resolvedException.getMessage()).isNotNull();
+
+        String firstNameError = "The field 'firstName' is required";
+        String lastNameError = "The field 'lastName' is required";
+        String emailError = "The field 'email' is required";
+
+        Assertions.assertThat(resolvedException.getMessage()).contains(firstNameError, lastNameError, emailError);
+    }
+
+    @Test
+    @DisplayName("POST /v1/users returns bad request when fields are blank")
+    @Order(12)
+    void save_ReturnsBadRequest_WhenFieldsAreBlank() throws Exception {
+        User userSaved = userUtils.newUserToBeSaved();
+        BDDMockito.when(repository.save(ArgumentMatchers.any(User.class))).thenReturn(userSaved);
+
+        String request = fileUtils.readResourceFile("user/post-request-user-blank-fields-400.json");
+        MvcResult mvcResult = mockMvc.perform(
+                        MockMvcRequestBuilders.post(URL)
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        Exception resolvedException = mvcResult.getResolvedException();
+        Assertions.assertThat(resolvedException.getMessage()).isNotNull();
+
+        String firstNameError = "The field 'firstName' is required";
+        String lastNameError = "The field 'lastName' is required";
+        String emailError = "The field 'email' is required";
+
+        Assertions.assertThat(resolvedException.getMessage()).contains(firstNameError, lastNameError, emailError);
     }
 }

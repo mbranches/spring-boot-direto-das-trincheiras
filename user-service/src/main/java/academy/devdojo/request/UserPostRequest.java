@@ -16,7 +16,7 @@ public class UserPostRequest {
     private String firstName;
     @NotBlank(message = "The field 'lastName' is required")
     private String lastName;
-    @NotBlank(message = "The field 'e-mail' is not valid")
-    @Email(regexp = "^(?!.*\\.\\.)([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})$", message = "e-mail is not valid")
+    @NotBlank(message = "The field 'email' is required")
+    @Email(regexp = "^(?!.*\\.\\.)([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})$", message = "email is not valid")
     private String email;
 }
