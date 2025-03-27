@@ -3,7 +3,6 @@ package academy.devdojo.controller;
 import academy.devdojo.model.User;
 import academy.devdojo.repository.UserData;
 import academy.devdojo.repository.UserHardCodedRepository;
-import academy.devdojo.request.UserPostRequest;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.UserUtils;
 import org.assertj.core.api.Assertions;
@@ -25,7 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -192,9 +191,9 @@ class UserControllerTest {
 
     @ParameterizedTest
     @MethodSource("postUserBadRequestSource")
-    @DisplayName("POST /v1/users returns bad request when fields is invalid")
+    @DisplayName("POST /v1/users returns bad request when fields are invalid")
     @Order(11)
-    void save_ReturnsBadRequest_WhenFieldsIsInvalid(String fileName, List<String> expectedErrors) throws Exception {
+    void save_ReturnsBadRequest_WhenFieldsAreInvalid(String fileName, List<String> expectedErrors) throws Exception {
         User userSaved = userUtils.newUserToBeSaved();
         BDDMockito.when(repository.save(ArgumentMatchers.any(User.class))).thenReturn(userSaved);
 
@@ -214,19 +213,66 @@ class UserControllerTest {
                 .contains(expectedErrors);
     }
 
+    @ParameterizedTest
+    @MethodSource("putUserBadRequestSource")
+    @DisplayName("PUT /v1/users returns bad request when fields are invalid")
+    @Order(12)
+    void update_ReturnsBadRequest_WhenFieldsAreInvalid(String fileName, List<String> expectedErrors) throws Exception {
+        User userSaved = userUtils.newUserToBeSaved();
+        BDDMockito.when(repository.save(ArgumentMatchers.any(User.class))).thenReturn(userSaved);
+
+        String request = fileUtils.readResourceFile("user/%s".formatted(fileName));
+        MvcResult mvcResult = mockMvc.perform(
+                        MockMvcRequestBuilders.put(URL)
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        Exception resolvedException = mvcResult.getResolvedException();
+        Assertions.assertThat(resolvedException.getMessage())
+                .isNotNull()
+                .contains(expectedErrors);
+    }
+
     private static Stream<Arguments> postUserBadRequestSource() {
+        List<String> allRequiredErrors = allRequiredErrors();
+        List<String> emailInvalidErrosList = emailInvalidError();
+
+        return Stream.of(
+                Arguments.of("put-request-user-empty-fields-400.json", allRequiredErrors),
+                Arguments.of("put-request-user-blank-fields-400.json", allRequiredErrors),
+                Arguments.of("put-request-user-invalid-email-400.json", emailInvalidErrosList)
+        );
+    }
+
+    private static Stream<Arguments> putUserBadRequestSource() {
+        String idNotNullError = "The field 'id' cannot be null";
+
+        List<String> allRequiredErrors = allRequiredErrors();
+        allRequiredErrors.add(idNotNullError);
+        List<String> emailInvalidErrosList = emailInvalidError();
+
+        return Stream.of(
+                Arguments.of("put-request-user-empty-fields-400.json", allRequiredErrors),
+                Arguments.of("put-request-user-blank-fields-400.json", allRequiredErrors),
+                Arguments.of("put-request-user-invalid-email-400.json", emailInvalidErrosList)
+        );
+    }
+
+    private static List<String> allRequiredErrors() {
         String firstNameRequiredError = "The field 'firstName' is required";
         String lastNameRequiredError = "The field 'lastName' is required";
         String emailRequiredError = "The field 'email' is required";
+
+        return new ArrayList<>(List.of(firstNameRequiredError, lastNameRequiredError, emailRequiredError));
+    }
+
+    private static List<String> emailInvalidError() {
         String emailInvalidError = "email is not valid";
 
-        List<String> allErrors = List.of(firstNameRequiredError, lastNameRequiredError, emailRequiredError);
-        List<String> emailInvalidErrosList = Collections.singletonList(emailInvalidError);
-
-        return Stream.of(
-                Arguments.of("post-request-user-empty-fields-400.json", allErrors),
-                Arguments.of("post-request-user-blank-fields-400.json", allErrors),
-                Arguments.of("post-request-user-invalid-email-400.json", emailInvalidErrosList)
-        );
+        return Collections.singletonList(emailInvalidError);
     }
 }
