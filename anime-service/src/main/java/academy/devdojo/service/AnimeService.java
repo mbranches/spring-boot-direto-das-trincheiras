@@ -1,5 +1,6 @@
 package academy.devdojo.service;
 
+import academy.devdojo.exception.NotFoundException;
 import academy.devdojo.model.Anime;
 import academy.devdojo.repository.AnimeHardCodedRepository;
 import academy.devdojo.repository.AnimeHardCodedRepository;
@@ -26,7 +27,7 @@ public class AnimeService {
     }
 
     public Anime findByIdOrThrowNotFound(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime not found"));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Anime not found"));
     }
 
     public Anime save(Anime anime) {
