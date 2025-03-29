@@ -107,8 +107,8 @@ class UserControllerTest {
 
     @Test
     @Order(5)
-    @DisplayName("GET /v1/users/randomId throws ResponseStatusException when id not exists")
-    void findById_ThrowsResponseStatusException_WhenIdNotExists() throws Exception {
+    @DisplayName("GET /v1/users/randomId throws NotFoundException when id not exists")
+    void findById_ThrowsNotFoundException_WhenIdNotExists() throws Exception {
         Long randomId = 12192L;
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", randomId))
@@ -153,8 +153,8 @@ class UserControllerTest {
 
     @Test
     @Order(8)
-    @DisplayName("PUT /v1/users throws ResponseStatusException when id not exists")
-    void update_ThrowsResponseStatusException_WhenUserNotExists() throws Exception {
+    @DisplayName("PUT /v1/users throws NotFoundException when id not exists")
+    void update_ThrowsNotFoundException_WhenUserNotExists() throws Exception {
         String request = fileUtils.readResourceFile("user/put-request-user-404.json");
 
         mockMvc.perform(
@@ -180,8 +180,8 @@ class UserControllerTest {
 
     @Test
     @Order(10)
-    @DisplayName("Delete /v1/users/randomId throws ResponseStatusException when id not exists")
-    void delete_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception {
+    @DisplayName("Delete /v1/users/randomId throws NotFoundException when id not exists")
+    void delete_ThrowsNotFoundException_WhenIdIsNotFound() throws Exception {
         long randomId = 12121L;
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", randomId))
                 .andDo(MockMvcResultHandlers.print())

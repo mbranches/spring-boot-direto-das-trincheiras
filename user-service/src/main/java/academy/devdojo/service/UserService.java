@@ -1,5 +1,6 @@
 package academy.devdojo.service;
 
+import academy.devdojo.exceptions.NotFoundException;
 import academy.devdojo.model.User;
 import academy.devdojo.repository.UserHardCodedRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class UserService {
 
     public User findByIdOrThrowsNotFoundException(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found"));
+                .orElseThrow(() -> new NotFoundException("User not Found"));
     }
 
     public User save(User user) {

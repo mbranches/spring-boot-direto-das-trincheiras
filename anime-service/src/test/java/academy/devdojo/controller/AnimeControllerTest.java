@@ -111,8 +111,8 @@ public class AnimeControllerTest {
 
     @Test
     @Order(5)
-    @DisplayName("GET /v1/animes/99 throws ResponseStatusException when id is not found")
-    void findByIdOrThrowNotFound_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception {
+    @DisplayName("GET /v1/animes/99 throws NotFoundException when id is not found")
+    void findByIdOrThrowNotFound_ThrowsNotFoundException_WhenIdIsNotFound() throws Exception {
         Long randomId = 13321910L;
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", randomId))
@@ -155,8 +155,8 @@ public class AnimeControllerTest {
 
     @Test
     @Order(8)
-    @DisplayName("DELETE /v1/animes/99 throws ResponseStatusException when id is not found")
-    void delete_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception {
+    @DisplayName("DELETE /v1/animes/99 throws NotFoundException when id is not found")
+    void delete_ThrowsNotFoundException_WhenIdIsNotFound() throws Exception {
         Long randomId = 99L;
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", randomId))
@@ -182,8 +182,8 @@ public class AnimeControllerTest {
 
     @Test
     @Order(10)
-    @DisplayName("UPDATE /v1/animes throws ResponseStatusException when id is not found")
-    void update_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception {
+    @DisplayName("UPDATE /v1/animes throws NotFoundException when id is not found")
+    void update_ThrowsNotFoundException_WhenIdIsNotFound() throws Exception {
         String request = fileUtils.readResourceFile("anime/put-request-anime-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders
