@@ -1,0 +1,13 @@
+services:
+  mysql:
+    image: mysql:9.0.1
+    environment: #variaveis de ambiente do container
+      MYSQL_ROOT_PASSWORD: devdojo
+      MYSQL_USER: branches
+      MYSQL_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - branches-db:/var/lib/mysql
+volumes:
+  branches-db:
