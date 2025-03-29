@@ -1,4 +1,4 @@
-package academy.devdojo.exception;
+package academy.devdojo.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;

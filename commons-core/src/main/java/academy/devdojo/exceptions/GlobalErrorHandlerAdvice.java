@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalErrorHandlerAdvice {
+public class    GlobalErrorHandlerAdvice {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<DefaultErrorMessage> handlerNotFoundException(NotFoundException e) {
         DefaultErrorMessage error = new DefaultErrorMessage(HttpStatus.NOT_FOUND.value(), e.getReason());
