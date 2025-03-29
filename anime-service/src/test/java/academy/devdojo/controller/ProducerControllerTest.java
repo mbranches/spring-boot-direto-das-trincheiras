@@ -100,10 +100,13 @@ class ProducerControllerTest {
     @Order(5)
     void findById_ThrowsNotFoundException_WhenProducerNotFound() throws Exception{
         Long randomId = 99L;
+
+        String expectedResponse = fileUtils.readResourceFile("producer/get-producer-by-id-404.json");
+
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", randomId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
+                .andExpect(MockMvcResultMatchers.content().json(expectedResponse));
         //Body vem vazio
     }
 
@@ -148,6 +151,9 @@ class ProducerControllerTest {
     @Order(8)
     void update_ThrowsNotFoundException_WhenProducerIsNotFound() throws Exception {
         String request = fileUtils.readResourceFile("producer/put-request-producer-404.json");
+
+        String expectedResponse = fileUtils.readResourceFile("producer/put-producer-404.json");
+
         mockMvc.perform(MockMvcRequestBuilders
                         .put(URL)
                         .content(request)
@@ -155,7 +161,7 @@ class ProducerControllerTest {
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
+                .andExpect(MockMvcResultMatchers.content().json(expectedResponse));
     }
 
     @Test
@@ -176,10 +182,12 @@ class ProducerControllerTest {
     void delete_ThrowsNotFoundException_WhenProducerIsNotFound() throws Exception {
         Long randomId = 99L;
 
+        String expectedResponse = fileUtils.readResourceFile("producer/delete-producer-by-id-404.json");
+
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", randomId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not found"));
+                .andExpect(MockMvcResultMatchers.content().json(expectedResponse));
     }
 
 }
