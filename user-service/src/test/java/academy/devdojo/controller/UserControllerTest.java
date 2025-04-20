@@ -3,6 +3,7 @@ package academy.devdojo.controller;
 import academy.devdojo.model.User;
 import academy.devdojo.repository.UserData;
 import academy.devdojo.repository.UserHardCodedRepository;
+import academy.devdojo.repository.UserRepository;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.UserUtils;
 import org.assertj.core.api.Assertions;
@@ -36,6 +37,8 @@ class UserControllerTest {
     private final String URL = "/v1/users";
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private UserRepository userRepository;
     @SpyBean
     private UserHardCodedRepository repository;
     @MockBean
@@ -58,6 +61,8 @@ class UserControllerTest {
     @DisplayName("GET /v1/users returns all users when first name is null")
     void findAll_ReturnsAllUsers_WhenNameIsNull() throws Exception {
         String expectedResponse = fileUtils.readResourceFile("user/get-user-null-firstname-200.json");
+
+        BDDMockito.when(userRepository.findAll()).thenReturn(userList);
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL))
                 .andDo(MockMvcResultHandlers.print())
