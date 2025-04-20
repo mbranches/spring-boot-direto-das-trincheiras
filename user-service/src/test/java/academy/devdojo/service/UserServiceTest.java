@@ -1,7 +1,6 @@
 package academy.devdojo.service;
 
 import academy.devdojo.model.User;
-import academy.devdojo.repository.UserHardCodedRepository;
 import academy.devdojo.repository.UserRepository;
 import academy.devdojo.utils.UserUtils;
 import org.assertj.core.api.Assertions;

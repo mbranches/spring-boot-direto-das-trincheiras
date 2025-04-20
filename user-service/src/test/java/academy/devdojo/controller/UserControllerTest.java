@@ -1,7 +1,6 @@
 package academy.devdojo.controller;
 
 import academy.devdojo.model.User;
-import academy.devdojo.repository.UserData;
 import academy.devdojo.repository.UserRepository;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.UserUtils;
