@@ -26,9 +26,7 @@ class UserServiceTest {
     @InjectMocks
     private UserUtils userUtils;
     @Mock
-    private UserHardCodedRepository repository;
-    @Mock
-    private UserRepository userRepository;
+    private UserRepository repository;
     private List<User> userList;
 
     @BeforeEach
@@ -40,7 +38,7 @@ class UserServiceTest {
     @DisplayName("findAll returns all users when argument is null")
     @Order(1)
     void findAll_ReturnsAllUsers_WhenArgumentIsNull() {
-        BDDMockito.when(userRepository.findAll()).thenReturn(userList);
+        BDDMockito.when(repository.findAll()).thenReturn(userList);
         List<User> response = service.findAll(null);
 
         Assertions.assertThat(response)
@@ -57,7 +55,7 @@ class UserServiceTest {
         String nameToBeSearched = expectedUser.getFirstName();
         List<User> expectedResponse = List.of(expectedUser);
 
-        BDDMockito.when(repository.findAllByName(nameToBeSearched)).thenReturn(expectedResponse);
+        BDDMockito.when(repository.findByFirstNameIgnoreCase(nameToBeSearched)).thenReturn(expectedResponse);
         List<User> response = service.findAll(nameToBeSearched);
 
         Assertions.assertThat(response)
@@ -72,7 +70,7 @@ class UserServiceTest {
     void findAll_ReturnsEmptyList_WhenNameGivenNotExists() {
         String randomName = "random-name";
 
-        BDDMockito.when(repository.findAllByName(randomName)).thenReturn(Collections.emptyList());
+        BDDMockito.when(repository.findByFirstNameIgnoreCase(randomName)).thenReturn(Collections.emptyList());
         List<User> response = service.findAll(randomName);
 
         Assertions.assertThat(response)
@@ -131,9 +129,9 @@ class UserServiceTest {
         userToBeUpdated.setFirstName("New First Name");
 
         BDDMockito.when(repository.findById(userToBeUpdated.getId())).thenReturn(Optional.of(userToBeUpdated));
-        BDDMockito.doNothing().when(repository).update(userToBeUpdated);
+        BDDMockito.when(repository.save(userToBeUpdated)).thenReturn(userToBeUpdated);
 
-        service.update(userToBeUpdated);
+        Assertions.assertThatNoException().isThrownBy(() -> service.update(userToBeUpdated));
     }
 
     @Test
@@ -159,7 +157,7 @@ class UserServiceTest {
         BDDMockito.when(repository.findById(idToBeDeleted)).thenReturn(Optional.of(userToBeDeleted));
         BDDMockito.doNothing().when(repository).delete(userToBeDeleted);
 
-        service.delete(idToBeDeleted);
+        Assertions.assertThatNoException().isThrownBy(() -> service.delete(idToBeDeleted));
     }
 
     @Test
