@@ -4,7 +4,9 @@ import academy.devdojo.exception.NotFoundException;
 import academy.devdojo.model.User;
 import academy.devdojo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class UserService {
     }
 
     public User save(User user) {
+        assertEmailDoesNotExists(user.getEmail());
         return repository.save(user);
     }
 
@@ -31,7 +34,26 @@ public class UserService {
     }
 
     public void update(User user) {
-        findByIdOrThrowsNotFoundException(user.getId());
+        assertUserExists(user);
+        assertEmailDoesNotExists(user.getEmail(), user.getId());
         repository.save(user);
+    }
+
+    public void assertUserExists(User user) {
+        findByIdOrThrowsNotFoundException(user.getId());
+    }
+
+    public void assertEmailDoesNotExists(String email) {
+        repository.findByEmail(email)
+                .ifPresent(this::throwsEmailAlreadyExists);
+    }
+
+    public void assertEmailDoesNotExists(String email, Long id) {
+        repository.findByEmailAndIdNot(email, id)
+                .ifPresent(this::throwsEmailAlreadyExists);
+    }
+
+    private void throwsEmailAlreadyExists(User user) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-mail '%s' already exists".formatted(user.getEmail()));
     }
 }
