@@ -3,6 +3,7 @@ package academy.devdojo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+@With
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

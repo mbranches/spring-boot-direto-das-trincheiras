@@ -1,5 +1,6 @@
 package academy.devdojo.service;
 
+import academy.devdojo.exception.EmailAlreadyExistsException;
 import academy.devdojo.exception.NotFoundException;
 import academy.devdojo.model.User;
 import academy.devdojo.repository.UserRepository;
@@ -54,6 +55,6 @@ public class UserService {
     }
 
     private void throwsEmailAlreadyExists(User user) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-mail '%s' already exists".formatted(user.getEmail()));
+        throw new EmailAlreadyExistsException("E-mail '%s' already exists".formatted(user.getEmail()));
     }
 }
