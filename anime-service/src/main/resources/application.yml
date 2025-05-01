@@ -1,4 +1,14 @@
 spring:
+  config:
+    import: optional:classpath:.env[.properties]
+  datasource:
+    url: jdbc:mysql://localhost:3307/anime_service?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: ${ENV_ROOT_USER}
+    password: ${ENV_ROOT_PASSWORD}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
   application:
     name: anime-service
   threads:
@@ -12,11 +22,6 @@ server:
   tomcat:
     threads: #threads de plataforma
       max: 20 #padrão é 200 -> diminuindo o numero de threads e habilitando as virtuals aumenta muito a performace com menos memoria
-database:
-  url: ${DB_URL:localhost}:${DB_PORT:3306}
-  username: ${LOCAL_USERNAME:branches}
-  password: ${LOCAL_PASSWORD:root}
-# password: xx  -> eu poderia sobrescrever utilizando a seguinte sintaxe em variaveis de ambiente: DATABASE_PASSWORD=yy
 logging:
   level:
     academy.devdojo: debug
