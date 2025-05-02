@@ -3,6 +3,8 @@ package academy.devdojo.anime;
 import academy.devdojo.exception.NotFoundException;
 import academy.devdojo.model.Anime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,10 @@ public class AnimeService {
 
     public List<Anime> findAll(String name) {
          return name == null ? repository.findAll() : repository.findAllByNameContaining((name));
+    }
+
+    public Page<Anime> findAllPageable(Pageable pageable) {
+         return repository.findAll(pageable);
     }
 
     public Anime findByIdOrThrowNotFound(Long id) {

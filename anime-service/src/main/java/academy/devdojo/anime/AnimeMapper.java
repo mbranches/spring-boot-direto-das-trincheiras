@@ -14,7 +14,6 @@ import java.util.List;
 public interface AnimeMapper {
     AnimeMapper INSTANCE = Mappers.getMapper(AnimeMapper.class);
 
-    @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(1, 10))")
     Anime toAnime(AnimePostRequest postRequest);
 
     Anime toAnime(AnimePutRequest putRequest);

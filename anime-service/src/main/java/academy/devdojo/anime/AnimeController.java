@@ -4,6 +4,8 @@ import academy.devdojo.model.Anime;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,14 @@ public class AnimeController {
         List<AnimeGetResponse> animeGetResponse = MAPPER.toAnimeGetResponseList(animes);
 
         return ResponseEntity.ok(animeGetResponse);
+    }
+
+    //v1/animes/paginated?size=3&page=3&sort=id,desc -> exemplo de parametros disponiveis
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<AnimeGetResponse>> findAllPaginated(Pageable pageable) {
+        Page<AnimeGetResponse> animes = SERVICE.findAllPageable(pageable).map(MAPPER::toAnimeGetResponse);
+
+        return ResponseEntity.ok(animes);
     }
 
     @PostMapping
