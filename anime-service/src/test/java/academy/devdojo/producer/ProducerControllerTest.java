@@ -8,7 +8,6 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
+import java.util.Optional;
 
 //Slices test -> é parecido com teste de integração, porém starta só os beans mais importantes
 @WebMvcTest(controllers = ProducerController.class) //se não definir, por padrão vai testar para todos os controllers
@@ -25,9 +25,7 @@ import java.util.List;
 class ProducerControllerTest {
     private static final String URL = "/v1/producers";
     @MockBean //No contexto do spring utilizar esse
-    private ProducerData producerData;
-    @SpyBean
-    private ProducerHardCodedRepository repository;
+    private ProducerRepository repository;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -39,7 +37,7 @@ class ProducerControllerTest {
     @BeforeEach
     void init() {
         producerList = producerUtils.newProducerList();
-        BDDMockito.when(producerData.getPRODUCERS()).thenReturn(producerList);
+        BDDMockito.when(repository.findAll()).thenReturn(producerList);
     }
 
     @Test
@@ -59,7 +57,11 @@ class ProducerControllerTest {
     @Order(2)
     void findAll_ReturnsFoundProducerInList_WhenNameExists() throws Exception {
         String responseExpected = fileUtils.readResourceFile("producer/get-producer-ufotable-name-200.json");
-        String name = "Ufotable";
+
+        Producer producerToBeFound = producerList.getFirst();
+        String name = producerToBeFound.getName();
+
+        BDDMockito.when(repository.findAllByNameContaining(name)).thenReturn(List.of(producerToBeFound));
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL).param("name", name))
                 .andDo(MockMvcResultHandlers.print())
@@ -85,7 +87,12 @@ class ProducerControllerTest {
     @Order(4)
     void findById_ReturnsProducerFound_WhenSuccessful() throws Exception{
         String responseExpected = fileUtils.readResourceFile("producer/get-producer-by-id-200.json");
-        Long id = 1L;
+
+        Producer producerToBeFound = producerList.getFirst();
+        Long id = producerToBeFound.getId();
+
+        BDDMockito.when(repository.findById(id)).thenReturn(Optional.of(producerToBeFound));
+
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}",id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -97,6 +104,7 @@ class ProducerControllerTest {
     @Order(5)
     void findById_ThrowsNotFoundException_WhenProducerNotFound() throws Exception{
         Long randomId = 99L;
+        BDDMockito.when(repository.findById(randomId)).thenReturn(Optional.empty());
 
         String expectedResponse = fileUtils.readResourceFile("producer/get-producer-by-id-404.json");
 
@@ -134,6 +142,11 @@ class ProducerControllerTest {
     void update_UpdatesProducer_WhenSuccessful() throws Exception {
         String request = fileUtils.readResourceFile("producer/put-request-producer-200.json");
 
+        Producer producerToBeFound = producerList.getFirst();
+        Long id = producerToBeFound.getId();
+
+        BDDMockito.when(repository.findById(id)).thenReturn(Optional.of(producerToBeFound));
+
         mockMvc.perform(MockMvcRequestBuilders
                         .put(URL)
                         .content(request)
@@ -165,8 +178,10 @@ class ProducerControllerTest {
     @DisplayName("DELETE /v1/producers/1 removes producer when successful")
     @Order(9)
     void delete_RemovesProducer_WhenSuccessful() throws Exception {
-        Producer producerToBeDeleted = this.producerList.get(0);
+        Producer producerToBeDeleted = this.producerList.getFirst();
         Long idToBeDeleted = producerToBeDeleted.getId();
+
+        BDDMockito.when(repository.findById(idToBeDeleted)).thenReturn(Optional.of(producerToBeDeleted));
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", idToBeDeleted))
                 .andDo(MockMvcResultHandlers.print())

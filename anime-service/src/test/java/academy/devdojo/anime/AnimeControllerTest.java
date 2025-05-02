@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @WebMvcTest(controllers = AnimeController.class)
-@ComponentScan(basePackages = "academy.devdojo")
+@ComponentScan(basePackages = {"academy.devdojo.anime", "academy.devdojo.utils"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AnimeControllerTest {
     private final String URL = "/v1/animes";

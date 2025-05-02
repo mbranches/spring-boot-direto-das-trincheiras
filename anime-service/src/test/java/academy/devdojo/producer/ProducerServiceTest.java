@@ -21,7 +21,7 @@ class ProducerServiceTest {
     @InjectMocks
     private ProducerService service;
     @Mock
-    private ProducerHardCodedRepository repository;
+    private ProducerRepository repository;
     @InjectMocks
     private ProducerUtils producerUtils;
     private List<Producer> producerList;
@@ -47,11 +47,11 @@ class ProducerServiceTest {
     @DisplayName("findAll returns list with found object when name exists")
     @Order(2)
     void findAll_ReturnsFoundProducerInList_WhenNameExists() {
-        Producer expectedProducer = producerList.get(0);
+        Producer expectedProducer = producerList.getFirst();
         String expectedProducerName = expectedProducer.getName();
         List<Producer> expectedList = Collections.singletonList(expectedProducer);
 
-        BDDMockito.when(repository.findByName(expectedProducerName)).thenReturn(expectedList);
+        BDDMockito.when(repository.findAllByNameContaining(expectedProducerName)).thenReturn(expectedList);
 
         List<Producer> producers = service.findAll(expectedProducerName);
 
@@ -66,7 +66,7 @@ class ProducerServiceTest {
     @Order(3)
     void findAll_ReturnsEmptyList_WhenNameNotFound() {
         String randomName = "name not found-----";
-        BDDMockito.when(repository.findByName(randomName)).thenReturn(Collections.emptyList());
+        BDDMockito.when(repository.findAllByNameContaining(randomName)).thenReturn(Collections.emptyList());
 
         List<Producer> producers = service.findAll(randomName);
 
@@ -79,7 +79,7 @@ class ProducerServiceTest {
     @DisplayName("findByIdOrThrowNotFound returns a producer with given id when successful")
     @Order(4)
     void findByIdOrThrowNotFound_ReturnsProducerById_WhenSuccessful() {
-        Producer expectedProducer = producerList.get(0);
+        Producer expectedProducer = producerList.getFirst();
         Long idToBeFound = expectedProducer.getId();
         BDDMockito.when(repository.findById(idToBeFound)).thenReturn(Optional.of(expectedProducer));
 
@@ -120,7 +120,7 @@ class ProducerServiceTest {
     @DisplayName("delete removes producer when successful")
     @Order(7)
     void delete_RemovesProducer_WhenSuccessful() {
-        Producer producerToBeDeleted = producerList.get(0);
+        Producer producerToBeDeleted = producerList.getFirst();
         Long idToBeDeleted = producerToBeDeleted.getId();
         BDDMockito.when(repository.findById(idToBeDeleted)).thenReturn(Optional.of(producerToBeDeleted));
 
@@ -145,12 +145,12 @@ class ProducerServiceTest {
     @DisplayName("update updates producer when successful")
     @Order(9)
     void update_UpdatesProducer_WhenSuccessful() {
-        Producer producerToBeUpdated = producerList.get(0);
+        Producer producerToBeUpdated = producerList.getFirst();
         producerToBeUpdated.setName("New name for producer");
         Long idToBeUpdated = producerToBeUpdated.getId();
 
         BDDMockito.when(repository.findById(idToBeUpdated)).thenReturn(Optional.of(producerToBeUpdated));
-        BDDMockito.doNothing().when(repository).update(producerToBeUpdated);
+        BDDMockito.when(repository.save(producerToBeUpdated)).thenReturn(producerToBeUpdated);
 
         Assertions.assertThatNoException().isThrownBy(() -> service.update(producerToBeUpdated));
     }
@@ -159,7 +159,7 @@ class ProducerServiceTest {
     @DisplayName("update throws ResponseStatusException when producer is not found")
     @Order(10)
     void update_ThrowsResponseStatusException_WhenProducerIsNotFound() {
-        Producer producerToBeUpdated = producerList.get(0);
+        Producer producerToBeUpdated = producerList.getFirst();
 
         BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
 
