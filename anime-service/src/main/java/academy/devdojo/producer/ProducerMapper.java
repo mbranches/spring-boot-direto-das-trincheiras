@@ -12,10 +12,6 @@ import java.util.List;
 @Primary
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProducerMapper {
-    ProducerMapper INSTANCE = Mappers.getMapper(ProducerMapper.class);
-
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(1, 100_000))")
     Producer toProducer(ProducerPostRequest postRequest);
 
     Producer toProducer(ProducerPutRequest putRequest);

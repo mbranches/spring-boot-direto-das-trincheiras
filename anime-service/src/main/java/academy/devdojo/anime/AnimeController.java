@@ -1,6 +1,5 @@
 package academy.devdojo.anime;
 
-import academy.devdojo.mapper.AnimeMapper;
 import academy.devdojo.model.Anime;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

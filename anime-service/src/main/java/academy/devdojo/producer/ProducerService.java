@@ -2,22 +2,18 @@ package academy.devdojo.producer;
 
 import academy.devdojo.exception.NotFoundException;
 import academy.devdojo.model.Producer;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProducerService {
-    private final ProducerHardCodedRepository repository;
-
-    @Autowired
-    public ProducerService(ProducerHardCodedRepository repository) {
-        this.repository = repository;
-    }
+    private final ProducerRepository repository;
 
     public List<Producer> findAll(String name) {
-         return name == null ? repository.findAll() : repository.findByName(name);
+         return name == null ? repository.findAll() : repository.findAllByNameContaining((name));
     }
 
     public Producer findByIdOrThrowNotFound(Long id) {
@@ -33,10 +29,11 @@ public class ProducerService {
     }
 
     public void update(Producer producerToUpdated) {
-        Producer originalProducer = findByIdOrThrowNotFound(producerToUpdated.getId());
+        assertProducerExists(producerToUpdated.getId());
+        repository.save(producerToUpdated);
+    }
 
-        producerToUpdated.setCreatedAt(originalProducer.getCreatedAt());
-
-        repository.update(producerToUpdated);
+    public void assertProducerExists(Long id) {
+        findByIdOrThrowNotFound(id);
     }
 }

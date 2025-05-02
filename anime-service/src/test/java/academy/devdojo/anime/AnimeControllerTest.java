@@ -35,18 +35,16 @@ public class AnimeControllerTest {
     private AnimeRepository repository;
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private AnimeData animeData;
     @Autowired
     private FileUtils fileUtils;
     @Autowired
     private AnimeUtils animeUtils;
     private List<Anime> animeList;
 
-        @BeforeEach
-        void init() {
-            animeList = animeUtils.newAnimeList();
-        }
+    @BeforeEach
+    void init() {
+        animeList = animeUtils.newAnimeList();
+    }
 
     @Test
     @Order(1)
