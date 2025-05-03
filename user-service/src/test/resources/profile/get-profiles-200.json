@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Administrator",
+    "description": "Admins everything"
+  },
+  {
+    "name": "Manager",
+    "description": "Managers users"
+  }
+]

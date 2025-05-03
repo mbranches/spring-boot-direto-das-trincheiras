@@ -1,6 +1,7 @@
 package academy.devdojo.controller;
 
 import academy.devdojo.model.User;
+import academy.devdojo.repository.ProfileRepository;
 import academy.devdojo.repository.UserRepository;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.UserUtils;
@@ -35,6 +36,8 @@ class UserControllerTest {
     private final String URL = "/v1/users";
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private ProfileRepository profileRepository;
     @MockBean
     private UserRepository repository;
     @Autowired
@@ -260,9 +263,9 @@ class UserControllerTest {
         List<String> emailInvalidErrosList = emailInvalidError();
 
         return Stream.of(
-                Arguments.of("put-request-user-empty-fields-400.json", allRequiredErrors),
-                Arguments.of("put-request-user-blank-fields-400.json", allRequiredErrors),
-                Arguments.of("put-request-user-invalid-email-400.json", emailInvalidErrosList)
+                Arguments.of("post-request-user-empty-fields-400.json", allRequiredErrors),
+                Arguments.of("post-request-user-blank-fields-400.json", allRequiredErrors),
+                Arguments.of("post-request-user-invalid-email-400.json", emailInvalidErrosList)
         );
     }
 
