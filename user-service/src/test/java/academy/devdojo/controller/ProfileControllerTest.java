@@ -2,6 +2,7 @@ package academy.devdojo.controller;
 
 import academy.devdojo.model.Profile;
 import academy.devdojo.repository.ProfileRepository;
+import academy.devdojo.repository.UserProfileRepository;
 import academy.devdojo.repository.UserRepository;
 import academy.devdojo.utils.FileUtils;
 import academy.devdojo.utils.ProfileUtils;
@@ -38,6 +39,8 @@ class ProfileControllerTest {
     private UserRepository userRepository;
     @MockBean
     private ProfileRepository repository;
+    @MockBean
+    private UserProfileRepository userProfileRepository;
     @Autowired
     private FileUtils fileUtils;
     @Autowired
