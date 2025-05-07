@@ -11,6 +11,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
   threads:
     virtual:
       enabled: true
@@ -21,3 +22,7 @@ server:
     threads:
       max: 20
   port: 8090
+logging:
+  level:
+    net.ttddyy.dsproxy.listener: debug
+#    org.hibernate.orm.jdbc.bind: trace
