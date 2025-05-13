@@ -1,8 +1,10 @@
 package academy.devdojo.controller;
 
 import academy.devdojo.mapper.UserProfileMapper;
+import academy.devdojo.model.User;
 import academy.devdojo.model.UserProfile;
 import academy.devdojo.response.UserProfileGetResponse;
+import academy.devdojo.response.UserProfileUserGetResponse;
 import academy.devdojo.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,15 @@ public class UserProfileController {
         List<UserProfile> userProfiles = service.findAll();
 
         List<UserProfileGetResponse> response = mapper.toUserProfileGetResponseList(userProfiles);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/profiles/{id}/users")
+    public ResponseEntity<List<UserProfileUserGetResponse>> findAllUsersByProfileId(@PathVariable Long id) {
+        List<User> userList = service.findAllUsersByProfileId(id);
+
+        List<UserProfileUserGetResponse> response = mapper.toUserProfileUserGetResponseList(userList);
 
         return ResponseEntity.ok(response);
     }

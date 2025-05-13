@@ -1,7 +1,9 @@
 package academy.devdojo.service;
 
+import academy.devdojo.model.User;
 import academy.devdojo.model.UserProfile;
 import academy.devdojo.repository.UserProfileRepository;
+import academy.devdojo.response.UserProfileUserGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,5 +20,10 @@ public class UserProfileService {
 
     public UserProfile save(UserProfile profile) {
         return repository.save(profile);
+    }
+
+    public List<User> findAllUsersByProfileId(Long profileId) {
+        List<User> users = repository.findAllUsersByProfileId(profileId);
+        return users;
     }
 }
