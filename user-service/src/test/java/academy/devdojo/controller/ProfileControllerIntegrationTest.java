@@ -1,18 +1,20 @@
 package academy.devdojo.controller;
 
+import academy.devdojo.model.Profile;
 import academy.devdojo.response.ProfileGetResponse;
+import academy.devdojo.response.ProfilePostResponse;
+import academy.devdojo.utils.FileUtils;
+import academy.devdojo.utils.ProfileUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.io.IOException;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -21,6 +23,10 @@ public class ProfileControllerIntegrationTest {
     private static final String URL = "/v1/profiles";
     @Autowired
     private TestRestTemplate testRestTemplate;
+    @Autowired
+    private ProfileUtils profileUtils;
+    @Autowired
+    private FileUtils fileUtils;
 
     @Test
     @DisplayName("GET /v1/profiles returns all profiles when first name is null")
@@ -35,6 +41,39 @@ public class ProfileControllerIntegrationTest {
         Assertions.assertThat(response.getBody()).isNotNull().doesNotContainNull();
 
         response.getBody().forEach(p -> Assertions.assertThat(p).hasNoNullFieldsOrProperties());
+    }
+
+    @Test
+    @DisplayName("GET /v1/profiles returns an empty list when nothing is found")
+    @Order(2)
+    void findAll_ReturnsEmptyList_WhenNothingIsNotFound() {
+        ParameterizedTypeReference<List<ProfileGetResponse>> typeReference = new ParameterizedTypeReference<>() {};
+        ResponseEntity<List<ProfileGetResponse>> response = testRestTemplate.exchange(URL, HttpMethod.GET, null, typeReference);
+
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(response.getBody()).isNotNull().isEmpty();
+    }
+
+    @Test
+    @DisplayName("POST /v1/profiles returns saved profile when successful")
+    @Order(3)
+    void save_ReturnsSavedProfile_WhenSuccessful() throws IOException {
+        String request = fileUtils.readResourceFile("profile/post-request-profile-200.json");
+        HttpEntity<String> profileHttpEntity = buildHttpRequest(request);
+
+        ResponseEntity<ProfilePostResponse> response = testRestTemplate.exchange(URL, HttpMethod.POST, profileHttpEntity, ProfilePostResponse.class);
+
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        Assertions.assertThat(response.getBody()).isNotNull().hasNoNullFieldsOrProperties();
+    }
+
+    private static HttpEntity<String> buildHttpRequest(String json) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        return new HttpEntity<>(json, httpHeaders);
     }
 }
 
