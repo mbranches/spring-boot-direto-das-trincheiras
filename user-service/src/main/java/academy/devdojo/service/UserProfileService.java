@@ -23,7 +23,6 @@ public class UserProfileService {
     }
 
     public List<User> findAllUsersByProfileId(Long profileId) {
-        List<User> users = repository.findAllUsersByProfileId(profileId);
-        return users;
+        return repository.findAllUsersByProfileId(profileId);
     }
 }

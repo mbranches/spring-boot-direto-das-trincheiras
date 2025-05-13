@@ -5,6 +5,7 @@ import lombok.*;
 
 @Data
 @Builder
+@With
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @NoArgsConstructor
