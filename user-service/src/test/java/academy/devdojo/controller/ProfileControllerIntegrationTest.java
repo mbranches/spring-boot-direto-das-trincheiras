@@ -1,5 +1,6 @@
 package academy.devdojo.controller;
 
+import academy.devdojo.config.IntegrationTestConfig;
 import academy.devdojo.config.TestcontainersConfiguration;
 import academy.devdojo.response.ProfileGetResponse;
 import academy.devdojo.response.ProfilePostResponse;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
@@ -26,9 +28,8 @@ import java.util.stream.Stream;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestcontainersConfiguration.class)
 @Transactional
-public class ProfileControllerIntegrationTest {
+public class ProfileControllerIntegrationTest extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
     @Autowired
     private TestRestTemplate testRestTemplate;

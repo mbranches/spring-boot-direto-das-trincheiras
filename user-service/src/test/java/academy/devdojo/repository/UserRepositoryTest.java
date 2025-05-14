@@ -1,5 +1,6 @@
 package academy.devdojo.repository;
 
+import academy.devdojo.config.IntegrationTestConfig;
 import academy.devdojo.config.TestcontainersConfiguration;
 import academy.devdojo.model.User;
 import academy.devdojo.utils.UserUtils;
@@ -15,9 +16,9 @@ import java.util.List;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({UserUtils.class, TestcontainersConfiguration.class})
+@Import(UserUtils.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserRepositoryTest {
+class UserRepositoryTest extends IntegrationTestConfig {
     @Autowired
     private UserRepository repository;
     @Autowired
@@ -41,10 +42,12 @@ class UserRepositoryTest {
     void save_ReturnsSavedUser_WhenSuccessful() {
         User userToBeSaved = userUtils.newUserToBeSaved().withId(null);
 
+        User userSaved = userUtils.newUserToBeSaved().withId(1L);
+
         User response = repository.save(userToBeSaved);
 
         Assertions.assertThat(response)
                 .isNotNull()
-                .isEqualTo(userToBeSaved);
+                .isEqualTo(userSaved);
     }
 }
