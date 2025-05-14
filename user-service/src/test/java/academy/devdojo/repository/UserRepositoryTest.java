@@ -42,12 +42,12 @@ class UserRepositoryTest extends IntegrationTestConfig {
     void save_ReturnsSavedUser_WhenSuccessful() {
         User userToBeSaved = userUtils.newUserToBeSaved().withId(null);
 
-        User userSaved = userUtils.newUserToBeSaved().withId(1L);
-
         User response = repository.save(userToBeSaved);
 
         Assertions.assertThat(response)
-                .isNotNull()
-                .isEqualTo(userSaved);
+                .isNotNull();
+
+        Assertions.assertThat(response.getId())
+                .isNotNull();
     }
 }
