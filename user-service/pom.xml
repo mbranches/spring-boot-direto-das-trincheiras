@@ -84,6 +84,13 @@
 			<artifactId>datasource-proxy-spring-boot-starter</artifactId>
 			<version>1.9.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.javacrumbs.json-unit</groupId>
+			<artifactId>json-unit-assertj</artifactId>
+			<version>4.1.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
