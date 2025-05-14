@@ -19,7 +19,7 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserProfileProfileServiceTest {
+class UserProfileServiceTest {
     @InjectMocks
     private UserProfileService service;
     @InjectMocks
