@@ -22,7 +22,7 @@ class UserProfileRepositoryTest extends IntegrationTestConfig {
     @Test
     @DisplayName("findAll returns all userProfiles when successful")
     @Order(1)
-    @Sql("/sql/init_user_profile_2_users_1_profile.sql")
+    @Sql("/sql/user_profile/init_user_profile_2_users_1_profile.sql")
     void findAll_ReturnsAllUserProfiles_WhenSuccessful() {
         List<UserProfile> response = repository.findAll();
 
@@ -34,7 +34,7 @@ class UserProfileRepositoryTest extends IntegrationTestConfig {
     @Test
     @DisplayName("findAll returns all users by profile id when successful")
     @Order(2)
-    @Sql("/sql/init_user_profile_2_users_1_profile.sql")
+    @Sql("/sql/user_profile/init_user_profile_2_users_1_profile.sql")
     void findAll_ReturnsAllUsersByProfileId_WhenSuccessful() {
         Long profileId = 1L;
         List<User> response = repository.findAllUsersByProfileId(profileId);

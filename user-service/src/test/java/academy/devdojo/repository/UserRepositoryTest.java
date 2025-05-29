@@ -1,7 +1,6 @@
 package academy.devdojo.repository;
 
 import academy.devdojo.config.IntegrationTestConfig;
-import academy.devdojo.config.TestcontainersConfiguration;
 import academy.devdojo.model.User;
 import academy.devdojo.utils.UserUtils;
 import org.assertj.core.api.Assertions;
@@ -27,7 +26,7 @@ class UserRepositoryTest extends IntegrationTestConfig {
     @Test
     @DisplayName("findAll returns all users when successful")
     @Order(1)
-    @Sql("/sql/init_one_user.sql")
+    @Sql("/sql/user/init_one_user.sql")
     void findAll_ReturnsAllUsers_WhenSuccessful() {
         List<User> response = repository.findAll();
 

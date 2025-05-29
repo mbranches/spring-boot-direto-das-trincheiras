@@ -36,7 +36,8 @@ public class ProfileControllerRestAssuredIntegrationTest extends IntegrationTest
 
     @Test
     @DisplayName("GET /v1/profiles returns all profiles when first name is null")
-    @Sql(value = "/sql/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) @Sql(value = "/sql/clean_profile.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/profile/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/profile/clean_profile.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Order(1)
     void findAll_ReturnsAllProfiles_WhenNameIsNull() throws IOException {
         String expectedResponse = fileUtils.readResourceFile("profile/get-profiles-200.json");
