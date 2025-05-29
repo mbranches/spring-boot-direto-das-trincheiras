@@ -3,6 +3,7 @@ package academy.devdojo.controller;
 import academy.devdojo.config.IntegrationTestConfig;
 import academy.devdojo.utils.FileUtils;
 import io.restassured.http.ContentType;
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,32 +47,47 @@ public class ProfileControllerRestAssuredIntegrationTest extends IntegrationTest
                 .log().all();
 
     }
-//
-//    @Test
-//    @DisplayName("GET /v1/profiles returns an empty list when nothing is found")
-//    @Order(2)
-//    void findAll_ReturnsEmptyList_WhenNothingIsNotFound() {
-//        ParameterizedTypeReference<List<ProfileGetResponse>> typeReference = new ParameterizedTypeReference<>() {};
-//        ResponseEntity<List<ProfileGetResponse>> response = testRestTemplate.exchange(URL, HttpMethod.GET, null, typeReference);
-//
-//        Assertions.assertThat(response).isNotNull();
-//        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//        Assertions.assertThat(response.getBody()).isNotNull().isEmpty();
-//    }
-//
-//    @Test
-//    @DisplayName("POST /v1/profiles returns saved profile when successful")
-//    @Order(3)
-//    void save_ReturnsSavedProfile_WhenSuccessful() throws IOException {
-//        String request = fileUtils.readResourceFile("profile/post-request-profile-200.json");
-//        HttpEntity<String> profileHttpEntity = buildHttpRequest(request);
-//
-//        ResponseEntity<ProfilePostResponse> response = testRestTemplate.exchange(URL, HttpMethod.POST, profileHttpEntity, ProfilePostResponse.class);
-//
-//        Assertions.assertThat(response).isNotNull();
-//        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-//        Assertions.assertThat(response.getBody()).isNotNull().hasNoNullFieldsOrProperties();
-//    }
+
+    @Test
+    @DisplayName("GET /v1/profiles returns an empty list when nothing is found")
+    @Order(2)
+    void findAll_ReturnsEmptyList_WhenNothingIsNotFound() throws IOException {
+
+        String expectedResponse = fileUtils.readResourceFile("profile/get-profiles-empty-list-200.json");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .when()
+                .get(URL)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(Matchers.equalTo(expectedResponse))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("POST /v1/profiles returns saved profile when successful")
+    @Order(3)
+    void save_ReturnsSavedProfile_WhenSuccessful() throws IOException {
+        String request = fileUtils.readResourceFile("profile/post-request-profile-200.json");
+
+        String response = RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(URL)
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .log().all()
+                .extract().response().body().asString();
+
+        JsonAssertions.assertThatJson(response)
+                .isNotNull()
+                .node("id")
+                .isNumber()
+                .isPositive();
+
+    }
 //
 //    @ParameterizedTest
 //    @MethodSource("postProfileBadRequestSource")
