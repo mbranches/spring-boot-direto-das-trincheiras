@@ -321,11 +321,34 @@ class UserControllerIntegrationTest extends IntegrationTestConfig {
         );
     }
 
-//    @ParameterizedTest
-//    @MethodSource("putUserBadRequestSource")
-//    @DisplayName("PUT /v1/users returns bad request when fields are invalid")
-//    @Order(12)
-//    void update_ReturnsBadRequest_WhenFieldsAreInvalid(String fileName, String responseFile) throws Exception {
-//
-//    }
+    @ParameterizedTest
+    @MethodSource("putUserBadRequestSource")
+    @DisplayName("PUT /v1/users returns bad request when fields are invalid")
+    @Order(12)
+    void update_ReturnsBadRequest_WhenFieldsAreInvalid(String requestFile, String responseFile) throws Exception {
+        String request = fileUtils.readResourceFile("user/%s".formatted(requestFile));
+        String expectedResponse = fileUtils.readResourceFile("user/%s".formatted(responseFile));
+
+        String response = RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .put(URL)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .log().all()
+                .extract().response().body().asString();
+
+        JsonAssertions.assertThatJson(response)
+                .whenIgnoringPaths("timestamp")
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedResponse);
+    }
+
+    private static Stream<Arguments> putUserBadRequestSource() {
+        return Stream.of(
+                Arguments.of("put-request-user-empty-fields-400.json", "put-response-user-empty-fields-400.json"),
+                Arguments.of("put-request-user-blank-fields-400.json", "put-response-user-blank-fields-400.json")
+        );
+    }
 }
