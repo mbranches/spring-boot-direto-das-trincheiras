@@ -7,17 +7,31 @@ import academy.devdojo.utils.FileUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
+import net.javacrumbs.jsonunit.core.Option;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -274,4 +288,44 @@ class UserControllerIntegrationTest extends IntegrationTestConfig {
                 .body(Matchers.equalTo(expectedResponse))
                 .log().all();
     }
+
+    @ParameterizedTest
+    @DisplayName("POST /v1/users returns bad request when fields are invalid")
+    @MethodSource("postUserBadRequestSource")
+    @Order(11)
+    void save_ReturnsBadRequest_WhenFieldsAreInvalid(String requestFile, String fileResponse) throws Exception {
+        String request = fileUtils.readResourceFile("user/%s".formatted(requestFile));
+        String expectedResponse = fileUtils.readResourceFile("user/%s".formatted(fileResponse));
+
+        String response = RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(URL)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .log().all()
+                .extract().response().body().asString();
+
+        JsonAssertions.assertThatJson(response)
+                .whenIgnoringPaths("timestamp")
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedResponse);
+    }
+
+    private static Stream<Arguments> postUserBadRequestSource() {
+        return Stream.of(
+                Arguments.of("post-request-user-empty-fields-400.json", "put-response-user-empty-fields-400.json"),
+                Arguments.of("post-request-user-blank-fields-400.json", "put-response-user-blank-fields-400.json"),
+                Arguments.of("post-request-user-invalid-email-400.json", "put-response-user-invalid-email-400.json")
+        );
+    }
+
+//    @ParameterizedTest
+//    @MethodSource("putUserBadRequestSource")
+//    @DisplayName("PUT /v1/users returns bad request when fields are invalid")
+//    @Order(12)
+//    void update_ReturnsBadRequest_WhenFieldsAreInvalid(String fileName, String responseFile) throws Exception {
+//
+//    }
 }
