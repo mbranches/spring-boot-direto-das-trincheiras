@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -161,5 +162,116 @@ class UserControllerIntegrationTest extends IntegrationTestConfig {
         JsonAssertions.assertThatJson(response)
                 .whenIgnoringPaths("id")
                 .isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @DisplayName("POST /v1/users returns saved user when successful")
+    @Sql(value = "/sql/user/clean_user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Order(6)
+    void save_ReturnsSavedUser_WhenSuccessful() throws Exception {
+        String request = fileUtils.readResourceFile("user/post-request-user-200.json");
+        String expectedResponse = fileUtils.readResourceFile("user/post-response-user-201.json");
+
+        String response = RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(URL)
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .log().all()
+                .extract().response().body().asString();
+
+        JsonAssertions.assertThatJson(response)
+                .node("id")
+                .isNotNull()
+                .isNumber()
+                .isPositive();
+
+        JsonAssertions.assertThatJson(response)
+                .whenIgnoringPaths("id")
+                .isNotNull()
+                .isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @Sql(value = "/sql/user/init_three_user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/user/clean_user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @DisplayName("Delete /v1/users/1 removes user when successful")
+    @Order(7)
+    void delete_RemovesUser_WhenSuccessful() {
+        List<User> users = repository.findByFirstNameIgnoreCase("Marcelo");
+
+        Assertions.assertThat(users)
+                .hasSize(1);
+
+        Long idToDelete = users.getFirst().getId();
+        RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .when()
+                .pathParam("id", idToDelete)
+                .delete(URL + "/{id}")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("Delete /v1/users/randomId throws NotFoundException when id not exists")
+    @Order(8)
+    void delete_ThrowsNotFoundException_WhenIdIsNotFound() throws Exception {
+        String expectedResponse = fileUtils.readResourceFile("user/delete-user-by-id-404.json");
+
+        Long randomId = 999L;
+        RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .when()
+                .pathParam("id", randomId)
+                .delete(URL + "/{id}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .body(Matchers.equalTo(expectedResponse))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT /v1/users updates given user when successful")
+    @Sql(value = "/sql/user/clean_user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/user/init_three_user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Order(9)
+    void update_UpdatesGivenUser_WhenSuccessful() throws Exception {
+        String request = fileUtils.readResourceFile("user/put-request-user-200.json");
+
+        List<User> users = repository.findByFirstNameIgnoreCase("Marcelo");
+        User userToUpdate = users.getFirst();
+
+        request = request.replace("1", userToUpdate.getId().toString());
+
+        RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .put(URL)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT /v1/users throws NotFoundException when id not exists")
+    @Order(10)
+    void update_ThrowsNotFoundException_WhenUserNotExists() throws Exception {
+        String request = fileUtils.readResourceFile("user/put-request-user-404.json");
+        String expectedResponse = fileUtils.readResourceFile("user/put-user-404.json");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .put(URL)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .body(Matchers.equalTo(expectedResponse))
+                .log().all();
     }
 }
