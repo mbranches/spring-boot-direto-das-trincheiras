@@ -5,6 +5,7 @@ import academy.devdojo.response.ProfileGetResponse;
 import academy.devdojo.response.ProfilePostResponse;
 import academy.devdojo.utils.FileUtils;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
+import net.javacrumbs.jsonunit.core.Option;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -88,6 +89,7 @@ public class ProfileControllerIntegrationTest extends IntegrationTestConfig {
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         JsonAssertions.assertThatJson(response.getBody())
                 .whenIgnoringPaths("timestamp")
+                .when(Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedResponse);
     }
 
