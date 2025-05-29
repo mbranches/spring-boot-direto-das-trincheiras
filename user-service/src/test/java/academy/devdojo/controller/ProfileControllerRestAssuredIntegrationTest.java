@@ -6,6 +6,9 @@ import io.restassured.http.ContentType;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -14,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 import io.restassured.RestAssured;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -88,39 +92,36 @@ public class ProfileControllerRestAssuredIntegrationTest extends IntegrationTest
                 .isPositive();
 
     }
-//
-//    @ParameterizedTest
-//    @MethodSource("postProfileBadRequestSource")
-//    @DisplayName("save returns BadRequestException when the fields are invalid")
-//    @Order(4)
-//    void save_ReturnsBadRequestException_WhenTheFieldsAreInvalid(String requestFile, String responseFile) throws IOException {
-//        String request = fileUtils.readResourceFile("profile/%s".formatted(requestFile));
-//        String expectedResponse = fileUtils.readResourceFile("profile/%s".formatted(responseFile));
-//
-//        HttpEntity<String> httpEntityRequest = buildHttpRequest(request);
-//
-//        ResponseEntity<String> response  = testRestTemplate.exchange(URL, HttpMethod.POST, httpEntityRequest, String.class);
-//
-//        Assertions.assertThat(response).isNotNull();
-//        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        JsonAssertions.assertThatJson(response.getBody())
-//                .whenIgnoringPaths("timestamp")
-//                .isEqualTo(expectedResponse);
-//    }
-//
-//
-//    private static Stream<Arguments> postProfileBadRequestSource() {
-//        return Stream.of(
-//                Arguments.of("post-request-profile-empty-fields-400.json", "post-response-profile-empty-fields-400.json"),
-//                Arguments.of("post-request-profile-blank-fields-400.json", "post-response-profile-blank-fields-400.json")
-//        );
-//    }
-//
-//        private static HttpEntity<String> buildHttpRequest(String json) {
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-//
-//        return new HttpEntity<>(json, httpHeaders);
-//    }
+
+    @ParameterizedTest
+    @MethodSource("postProfileBadRequestSource")
+    @DisplayName("save returns BadRequestException when the fields are invalid")
+    @Order(4)
+    void save_ReturnsBadRequestException_WhenTheFieldsAreInvalid(String requestFile, String responseFile) throws IOException {
+        String request = fileUtils.readResourceFile("profile/%s".formatted(requestFile));
+        String expectedResponse = fileUtils.readResourceFile("profile/%s".formatted(responseFile));
+
+        String response = RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(URL)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .log().all()
+                .extract().response().body().asString();
+
+        JsonAssertions.assertThatJson(response)
+                .whenIgnoringPaths("timestamp")
+                .isEqualTo(expectedResponse);
+    }
+
+
+    private static Stream<Arguments> postProfileBadRequestSource() {
+        return Stream.of(
+                Arguments.of("post-request-profile-empty-fields-400.json", "post-response-profile-empty-fields-400.json"),
+                Arguments.of("post-request-profile-blank-fields-400.json", "post-response-profile-blank-fields-400.json")
+        );
+    }
 }
 
