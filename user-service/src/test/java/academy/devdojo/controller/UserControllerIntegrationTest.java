@@ -315,9 +315,9 @@ class UserControllerIntegrationTest extends IntegrationTestConfig {
 
     private static Stream<Arguments> postUserBadRequestSource() {
         return Stream.of(
-                Arguments.of("post-request-user-empty-fields-400.json", "put-response-user-empty-fields-400.json"),
-                Arguments.of("post-request-user-blank-fields-400.json", "put-response-user-blank-fields-400.json"),
-                Arguments.of("post-request-user-invalid-email-400.json", "put-response-user-invalid-email-400.json")
+                Arguments.of("post-request-user-empty-fields-400.json", "post-response-user-empty-fields-400.json"),
+                Arguments.of("post-request-user-blank-fields-400.json", "post-response-user-blank-fields-400.json"),
+                Arguments.of("post-request-user-invalid-email-400.json", "post-response-user-invalid-email-400.json")
         );
     }
 
