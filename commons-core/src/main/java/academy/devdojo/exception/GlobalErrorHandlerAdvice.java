@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -29,7 +30,13 @@ public class    GlobalErrorHandlerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
-        String defaultMessage = e.getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(","));
+        String defaultMessage = e.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .filter(Objects::nonNull)
+                .sorted()
+                .collect(Collectors.joining(","));
 
         ApiError response = ApiError.builder()
                 .timestamp(OffsetDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
