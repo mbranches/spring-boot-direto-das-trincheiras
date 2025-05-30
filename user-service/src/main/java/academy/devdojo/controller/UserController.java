@@ -79,6 +79,25 @@ public class UserController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Create user",
+            responses = {
+                    @ApiResponse(
+                            description = "Save user in the database",
+                            responseCode = "201",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserPostRequest.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            description = "User Not Found",
+                            responseCode = "404",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DefaultErrorMessage.class)
+                            )
+                    )
+            }
+    )
     public ResponseEntity<UserPostResponse> save(@RequestBody @Valid UserPostRequest userPostRequest) {
         User userToBeSaved = mapper.toUser(userPostRequest);
 
