@@ -4,6 +4,7 @@ import academy.devdojo.model.Anime;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +33,7 @@ public class AnimeController {
 
     //v1/animes/paginated?size=3&page=3&sort=id,desc -> exemplo de parametros disponiveis
     @GetMapping("/paginated")
-    public ResponseEntity<Page<AnimeGetResponse>> findAllPaginated(Pageable pageable) {
+    public ResponseEntity<Page<AnimeGetResponse>> findAllPaginated(@ParameterObject Pageable pageable) {
         Page<AnimeGetResponse> animes = SERVICE.findAllPageable(pageable).map(MAPPER::toAnimeGetResponse);
 
         return ResponseEntity.ok(animes);
