@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ProfileControllerRestAssuredIntegrationTest extends IntegrationTestConfig {
+public class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
     @Autowired
     private FileUtils fileUtils;

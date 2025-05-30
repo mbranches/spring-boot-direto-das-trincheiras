@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ProfileControllerIntegrationTest extends IntegrationTestConfig {
+public class ProfileControllerIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
     @Autowired
     private TestRestTemplate testRestTemplate;

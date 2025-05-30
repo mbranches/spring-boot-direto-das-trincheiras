@@ -17,7 +17,7 @@ import java.util.List;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(UserUtils.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserRepositoryTest extends IntegrationTestConfig {
+class UserRepositoryIT extends IntegrationTestConfig {
     @Autowired
     private UserRepository repository;
     @Autowired
